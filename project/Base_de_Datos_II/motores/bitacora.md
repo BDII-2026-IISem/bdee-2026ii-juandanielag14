@@ -713,6 +713,70 @@ CREATE TABLE product_return (
 
 ![](images/clipboard-172795436.png)
 
+![](images/clipboard-3482237772.png)
+
+creación de la tabla branch
+
+![](images/clipboard-3642285010.png)
+
+creación de tabla product
+
+![](images/clipboard-537901694.png)
+
+creación de tabla supplier
+
+![](images/clipboard-2265022035.png)
+
+![](images/clipboard-2059303183.png)
+
+creación de tabla purchase![](images/clipboard-1901530793.png)
+
+![](images/clipboard-3094235846.png)
+
+creación de tabla PuchaseDetail
+
+![](images/clipboard-1361540350.png)
+
+![](images/clipboard-1552782297.png)
+
+![](images/clipboard-2709910264.png)
+
+creación de tabla inventory
+
+![](images/clipboard-2944900251.png)
+
+![](images/clipboard-841465213.png)
+
+![](images/clipboard-3097698308.png)
+
+creación de tabla customer
+
+![](images/clipboard-3153762698.png)
+
+creación de tabla sale
+
+![](images/clipboard-2422150149.png)
+
+![](images/clipboard-3824877708.png)
+
+![](images/clipboard-1373749914.png)
+
+creación de tabla sale_detail
+
+![](images/clipboard-324573128.png)
+
+![](images/clipboard-1299974308.png)
+
+![](images/clipboard-3787595086.png)
+
+creación de tabla payment
+
+![](images/clipboard-1055439442.png)
+
+creación de tabla return
+
+creación de tabla\
+
 ## 4. ORACLE XE
 
 4.1 creación de tabla branch
