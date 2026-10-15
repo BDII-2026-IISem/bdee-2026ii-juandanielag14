@@ -1,0 +1,16 @@
+INSERT INTO product_return (reference_id, return_date, reason, total, status) VALUES
+(12, '2026-02-10 14:30:00', 'Producto defectuoso', 45000.50, 'APPROVED'),
+(45, '2026-02-12 09:15:00', 'Empaque dañado', 125000.00, 'PENDING'),
+(88, '2026-02-15 16:45:00', 'Cliente cambió de opinión', 85000.25, 'APPROVED'),
+(34, '2026-02-18 11:20:00', 'Talla incorrecta', 32500.00, 'REJECTED'),
+(3, '2026-02-20 10:05:00', 'Producto defectuoso', 195000.75, 'APPROVED'),
+(67, '2026-02-22 15:10:00', 'Artículo incompleto', 240000.00, 'PENDING'),
+(21, '2026-02-25 08:50:00', 'Cliente cambió de opinión', 55000.00, 'APPROVED'),
+(90, '2026-02-28 13:40:00', 'Error en el envío', 110000.50, 'APPROVED'),
+(15, '2026-03-02 17:00:00', 'Producto defectuoso', 285000.00, 'REJECTED'),
+(52, '2026-03-05 11:15:00', 'Empaque dañado', 75000.00, 'APPROVED'),
+(78, '2026-03-08 09:30:00', 'Cliente cambió de opinión', 160000.25, 'PENDING'),
+(4, '2026-03-10 14:25:00', 'Talla incorrecta', 42000.00, 'APPROVED'),
+(31, '2026-03-13 16:00:00', 'Producto defectuoso', 215000.00, 'APPROVED'),
+(95, '2026-03-16 10:45:00', 'Artículo incompleto', 98000.50, 'REJECTED'),
+(19, '2026-03-19 12:10:00', 'Cliente cambió de opinión', 18500.00, 'APPROVED');
