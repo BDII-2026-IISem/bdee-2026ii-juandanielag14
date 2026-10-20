@@ -490,7 +490,7 @@ SELECT C.name, C.phone, C.email FROM customer AS C;
 Combina `customer` y `sale` usando los campos de clave primaria y foránea en el `WHERE`.
 
 ``` sqlserver
-SELECT C.name, C.email, S.\* FROM customer AS C, sale AS S WHERE C.id = S.customer_id;
+SELECT C.name, C.email, S.* FROM customer AS C, sale AS S WHERE C.id = S.customer_id;
 ```
 
 #### Forma 2: Join explícito (cláusula JOIN ON)
@@ -498,7 +498,7 @@ SELECT C.name, C.email, S.\* FROM customer AS C, sale AS S WHERE C.id = S.custom
 Misma combinación utilizando la sintaxis estándar `JOIN ... ON`.
 
 ``` sqlserver
-SELECT C.name, C.email, S.\* FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id);
+SELECT C.name, C.email, S.* FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id);
 ```
 
 ### 4. Condiciones y Operadores en Consultas
@@ -508,13 +508,13 @@ SELECT C.name, C.email, S.\* FROM customer AS C JOIN sale AS S ON (C.id = S.cust
 #### Forma 1 (Implícita)
 
 ``` sqlserver
-SELECT C.name, C.email, S.\* FROM customer AS C, sale AS S WHERE C.id = S.customer_id AND S.sale_date = '2026-05-18 19:19:29';
+SELECT C.name, C.email, S.* FROM customer AS C, sale AS S WHERE C.id = S.customer_id AND S.sale_date = '2026-05-18 19:19:29';
 ```
 
 #### Forma 2 (Explícita)
 
 ``` sqlserver
-SELECT C.name, C.email, S.\* FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id) WHERE S.sale_date = '2026-05-18 19:19:29';
+SELECT C.name, C.email, S.* FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id) WHERE S.sale_date = '2026-05-18 19:19:29';
 ```
 
 #### 4.2. Operador LIKE (Búsquedas de texto)
@@ -568,13 +568,13 @@ SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTo
 #### Forma 1 (Implícita)
 
 ``` sqlserver
-SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio FROM customer AS C, sale AS S WHERE C.id = S.customer_id AND S.sale_date BETWEEN '2026-01-01' AND '2026-06-30' GROUP BY C.id, C.name HAVING COUNT(S.customer_id) \>= 2 ORDER BY TotalSuma DESC;
+SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio FROM customer AS C, sale AS S WHERE C.id = S.customer_id AND S.sale_date BETWEEN '2026-01-01' AND '2026-06-30' GROUP BY C.id, C.name HAVING COUNT(S.customer_id) >= 2 ORDER BY TotalSuma DESC;
 ```
 
 Forma 2 (Explícita)
 
 ``` sqlserver
-SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id) WHERE S.sale_date BETWEEN '2026-01-01' AND '2026-06-30' GROUP BY C.id, C.name HAVING COUNT(S.customer_id) \>= 2 ORDER BY TotalSuma DESC;
+SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio FROM customer AS C JOIN sale AS S ON (C.id = S.customer_id) WHERE S.sale_date BETWEEN '2026-01-01' AND '2026-06-30' GROUP BY C.id, C.name HAVING COUNT(S.customer_id) >= 2 ORDER BY TotalSuma DESC;
 ```
 
 ### 6. Subconsultas (Diferencia de Conjuntos $A - B$)
@@ -591,4 +591,172 @@ SELECT * FROM customer AS C WHERE C.id NOT IN ( SELECT S.customer_id FROM sale A
 
 ``` sqlserver
 SELECT C.* FROM customer AS C LEFT JOIN sale AS S ON (C.id = S.customer_id AND S.sale_date BETWEEN '2026-01-01' AND '2026-06-30') WHERE S.customer_id IS NULL;
+```
+
+### 1. Create — Insertar un nuevo cliente
+
+Omitimos el campo `id` por ser autoincremental (`GENERATED ALWAYS AS IDENTITY`) y asignamos los datos correspondientes en la tabla `customer`.
+
+``` sql
+INSERT INTO customer (document_type, document_number, name, phone, email) VALUES ('CC', '1043680256', 'Jaider Quintero', '3122589615', '[jq@gmail.com](mailto:jq@gmail.com){.email}');
+```
+
+### 2. Read — Consultas básicas de lectura
+
+#### 2.0. Consultar todos los clientes
+
+Muestra todos los campos y registros de la tabla `customer`.
+
+``` sql
+SELECT * FROM customer;
+```
+
+#### 2.1. Seleccionar columnas específicas
+
+Evita traer columnas innecesarias proyectando únicamente `name`, `phone` y `email`.
+
+``` sql
+SELECT name, phone, email FROM customer;
+```
+
+#### 2.2. Uso de alias de tabla
+
+Misma selección introduciendo el alias `C` para simplificar la sintaxis.
+
+SELECT C.name, C.phone, C.email FROM customer C;
+
+### 3. Consultar varias tablas (JOINs entre Clientes y Ventas)
+
+#### Forma 1: Join implícito (en la cláusula WHERE)
+
+Combina `customer` y `sale` usando los campos de clave primaria y foránea en el `WHERE`.
+
+``` sql
+SELECT C.name, C.email, S.* 
+FROM customer C, sale S 
+WHERE C.id = S.customer_id;
+```
+
+#### Forma 2: Join explícito (cláusula JOIN ON)
+
+Misma combinación utilizando la sintaxis estándar `JOIN ... ON`.
+
+``` sql
+SELECT C.name, C.email, S.* 
+FROM customer C 
+JOIN sale S ON (C.id = S.customer_id);
+```
+
+### 4. Condiciones y Operadores en Consultas
+
+#### 4.1. Filtro por fecha específica
+
+##### Forma 1 (Implícita)
+
+``` sql
+SELECT C.name, C.email, S.* 
+FROM customer C, sale S 
+WHERE C.id = S.customer_id AND S.sale_date = TO_TIMESTAMP('2026-05-18 19:19:29', 'YYYY-MM-DD HH24:MI:SS');
+```
+
+Forma 2 (Explícita)
+
+``` sql
+SELECT C.name, C.email, S.* 
+FROM customer C 
+JOIN sale S ON (C.id = S.customer_id) WHERE S.sale_date = TO_TIMESTAMP('2026-05-18 19:19:29', 'YYYY-MM-DD HH24:MI:SS');
+```
+
+#### 4.2. Operador LIKE (Búsquedas de texto)
+
+##### Emails que inician con 'm'
+
+``` sql
+SELECT * FROM customer C WHERE C.email LIKE 'm%';
+
+Emails que contengan el dominio 'gmail' (Usando el operador `||` o `CONCAT`)
+
+-- Opción 1: Operador de concatenación || SELECT * FROM customer C WHERE C.email LIKE '%' || 'gmail' || '%';
+
+-- Opción 2: Función CONCAT SELECT * FROM customer C WHERE C.email LIKE CONCAT(CONCAT('%', 'gmail'), '%');
+```
+
+#### 4.3. Consulta multi-tabla (Línea continua de 4 tablas con Rango y Ordenamiento)
+
+##### Forma 1 (Implícita)
+
+``` sql
+SELECT C.name AS cliente, S.id AS venta_id, S.sale_date, P.name AS producto, SD.quantity, SD.total 
+FROM customer C, sale S, sale_detail SD, product P 
+WHERE C.id = S.customer_id 
+  AND S.id = SD.header_id 
+  AND P.id = SD.item_id
+  AND S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+ORDER BY S.sale_date ASC;
+```
+
+Forma 2 (Explícita)
+
+``` sql
+SELECT C.name AS cliente, S.id AS venta_id, S.sale_date, P.name AS producto, SD.quantity, SD.total 
+FROM customer C 
+JOIN sale S ON (C.id = S.customer_id) 
+JOIN sale_detail SD ON (S.id = SD.header_id) 
+JOIN product P ON (P.id = SD.item_id) 
+WHERE S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+ORDER BY S.sale_date ASC;
+```
+
+### 5. Consultas de Agrupamiento (GROUP BY, HAVING)
+
+#### Agrupamiento básico (SUM, COUNT, AVG)
+
+##### Forma 1 (Implícita)
+
+``` sql
+SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio 
+FROM customer C, sale S 
+WHERE C.id = S.customer_id 
+  AND S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+GROUP BY C.id, C.name 
+ORDER BY TotalSuma DESC;
+```
+
+##### Forma 2 (Explícita)
+
+``` sql
+SELECT C.id, C.name, SUM(S.total) AS TotalSuma, COUNT(S.customer_id) AS CuentaTotal, AVG(S.total) AS Promedio 
+FROM customer C 
+JOIN sale S ON (C.id = S.customer_id) 
+WHERE S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS') 
+GROUP BY C.id, C.name 
+ORDER BY TotalSuma DESC;
+```
+
+### 6. Subconsultas (Diferencia de Conjuntos $A - B$)
+
+Obtiene los clientes registrados a los que no se les ha registrado ninguna venta dentro de un rango de fechas determinado.
+
+#### Forma 1 (Mediante NOT IN)
+
+``` sql
+SELECT * 
+FROM customer C 
+WHERE C.id NOT IN ( 
+    SELECT S.customer_id 
+    FROM sale S 
+    WHERE S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
+                        AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+);
+```
+
+Forma 2 (Mediante LEFT JOIN e IS NULL)
+
+``` sql
+SELECT C.* 
+FROM customer C 
+LEFT JOIN sale S ON (C.id = S.customer_id 
+                 AND S.sale_date BETWEEN TO_TIMESTAMP('2026-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
+                                     AND TO_TIMESTAMP('2026-06-30 23:59:59', 'YYYY-MM-DD HH24:MI:SS')) 
+WHERE S.customer_id IS NULL;
 ```
