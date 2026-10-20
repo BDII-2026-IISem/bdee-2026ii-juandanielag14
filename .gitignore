@@ -1,2 +1,4 @@
 data/
 services/
+**/.env
+!**/.env.example
