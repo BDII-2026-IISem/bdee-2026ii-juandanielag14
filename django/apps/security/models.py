@@ -1,5 +1,11 @@
+import uuid
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.core.validators import MinLengthValidator
 from django.db import models
+from django.utils import timezone
 
 from apps.common.status import RecordStatus
 
@@ -18,11 +24,7 @@ class StoreUserManager(UserManager):
 
 class User(AbstractUser):
     email = models.EmailField("correo electrónico", max_length=150, unique=True)
-    status = models.CharField(
-        max_length=8,
-        choices=RecordStatus.choices,
-        default=RecordStatus.INACTIVE,
-    )
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.INACTIVE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -44,3 +46,136 @@ class User(AbstractUser):
             self.email = self.email.strip().lower()
         self.is_active = self.status == RecordStatus.ACTIVE
         super().save(*args, **kwargs)
+
+
+class RefreshToken(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.RESTRICT,
+        related_name="refresh_tokens",
+        db_column="user_id",
+    )
+    token_hash = models.CharField(max_length=64, unique=True)
+    family_id = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    replaced_by = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="replacements",
+    )
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.ACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "refresh_tokens"
+        ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(status__in=RecordStatus.values),
+                name="refresh_tokens_status_valid",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} {self.family_id}"
+
+    @property
+    def is_usable(self):
+        return (
+            self.status == RecordStatus.ACTIVE
+            and self.revoked_at is None
+            and self.replaced_by_id is None
+            and self.expires_at > timezone.now()
+        )
+
+    @classmethod
+    def default_expiry(cls):
+        return timezone.now() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
+
+
+class HttpMethod(models.TextChoices):
+    GET = "GET", "GET"
+    POST = "POST", "POST"
+    PUT = "PUT", "PUT"
+    PATCH = "PATCH", "PATCH"
+    DELETE = "DELETE", "DELETE"
+
+
+class Role(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.INACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "roles"
+        ordering = ["name"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(status__in=RecordStatus.values), name="roles_status_valid"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class RoleUser(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.RESTRICT, related_name="assignments", db_column="role_id")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.RESTRICT,
+        related_name="role_links",
+        db_column="user_id",
+    )
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.INACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "role_users"
+        constraints = [
+            models.UniqueConstraint(fields=["role", "user"], name="role_user_unique"),
+            models.CheckConstraint(condition=models.Q(status__in=RecordStatus.values), name="role_users_status_valid"),
+        ]
+
+
+class Resource(models.Model):
+    name = models.CharField(max_length=150)
+    method = models.CharField(max_length=10, choices=HttpMethod.choices)
+    route = models.CharField(max_length=255)
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.INACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "resources"
+        ordering = ["route", "method"]
+        constraints = [
+            models.UniqueConstraint(fields=["method", "route"], name="resource_method_route_uniq"),
+            models.CheckConstraint(condition=models.Q(status__in=RecordStatus.values), name="resources_status_valid"),
+        ]
+
+    def __str__(self):
+        return f"{self.method} {self.route}"
+
+
+class ResourceRole(models.Model):
+    resource = models.ForeignKey(Resource, on_delete=models.RESTRICT, related_name="grants", db_column="resource_id")
+    role = models.ForeignKey(Role, on_delete=models.RESTRICT, related_name="grants", db_column="role_id")
+    status = models.CharField(max_length=8, choices=RecordStatus.choices, default=RecordStatus.INACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "resource_roles"
+        constraints = [
+            models.UniqueConstraint(fields=["resource", "role"], name="resource_role_unique"),
+            models.CheckConstraint(condition=models.Q(status__in=RecordStatus.values), name="resource_roles_status_valid"),
+        ]
+
+    def __str__(self):
+        return f"{self.role} -> {self.resource}"
