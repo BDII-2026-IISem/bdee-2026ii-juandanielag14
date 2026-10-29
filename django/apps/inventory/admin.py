@@ -16,3 +16,6 @@ class InventarioAdmin(admin.ModelAdmin):
         ("Existencias", {"fields": ("cantidad", "stock_minimo")}),
         ("Auditoría", {"fields": ("updated_at",), "classes": ("collapse",)}),
     )
+
+    def has_delete_permission(self, request, obj=None):
+        return False

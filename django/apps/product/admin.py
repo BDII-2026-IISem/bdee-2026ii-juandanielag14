@@ -16,3 +16,6 @@ class ProductAdmin(admin.ModelAdmin):
         ("Precio y estado", {"fields": ("precio", "is_active")}),
         ("Auditoría", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
+
+    def has_delete_permission(self, request, obj=None):
+        return False

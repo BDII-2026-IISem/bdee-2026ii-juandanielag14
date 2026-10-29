@@ -46,7 +46,7 @@ ls config
 
 ![EVI-00-02 - Árbol config y manage.py generados](trazabilidad/EVI-00-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé `manage.py` en la raíz y, dentro de `config/`, los archivos `settings.py`, `urls.py`, `wsgi.py` y h`asgi.py`.
+**Retroalimentación de la evidencia:** En la captura observé `manage.py` en la raíz y, dentro de `config/`, los archivos `settings.py`, `urls.py`, `wsgi.py` y `asgi.py`.
 
 **Conclusión y aprendizaje:** Aprendí que `startproject config .` no crea una carpeta doble `proyecto/proyecto/`. `urls.py` es el punto de entrada de todas las peticiones; en este ISS solo contiene la ruta `admin/`.
 
@@ -112,7 +112,7 @@ sudo apt install -y build-essential pkg-config default-libmysqlclient-dev python
 
 ![EVI-01-01 - Entorno virtual activo y dependencias del sistema](trazabilidad/EVI-01-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé el prompt con `(.venv)`, la ruta `[ruta exacta]/.venv/bin/python`, la versión `Python 3.14.4` y la instalación de las dependencias del sistema sin errores.
+**Retroalimentación de la evidencia:** En la captura observé el prompt con `(.venv)`, la ruta `/home/juand/ia-lab/django/.venv/bin/python`, la versión `Python 3.14.4` y la instalación de las dependencias del sistema sin errores.
 
 **Conclusión y aprendizaje:** Aprendí que `pip` y `python` deben apuntar al mismo entorno; de lo contrario, los drivers quedan instalados fuera del proyecto y `manage.py` no los encuentra.
 
@@ -134,7 +134,7 @@ cat requirements.txt
 
 ![EVI-01-03 - requirements.txt con los drivers](trazabilidad/EVI-01-03.png)
 
-**Retroalimentación de las evidencias:** En la primera captura observé [la última línea de la instalación de `oracledb 26.0.1` sin errores]. En la segunda observé [las versiones registradas: python-dotenv 1.2.3, psycopg 3.3.6, mysqlclient 2.3.0, mssql-django 2.0.0 y oracledb 26.0.1].
+**Retroalimentación de las evidencias:** En la primera captura observé la última línea de la instalación de `oracledb 26.0.1` sin errores. En la segunda observé las versiones registradas: python-dotenv 1.2.3, psycopg 3.3.6, mysqlclient 2.3.0, mssql-django 2.0.0 y oracledb 26.0.1.
 
 **Conclusión y aprendizaje:** Aprendí que cada motor necesita su propio driver. `psycopg` sirve a PostgreSQL, `mysqlclient` a MySQL, `mssql-django` registra el motor `mssql` y necesita pyodbc y el driver ODBC del sistema para conectarse, y `oracledb` en modo thin conecta a Oracle sin Instant Client. `requirements.txt` deja constancia de las versiones exactas para reproducir el entorno.
 
@@ -149,7 +149,7 @@ ls config
 ```
 
 ![EVI-01-04 - Carpeta config tras reemplazar settings.py](./trazabilidad/EVI-01-04.png)
-**Retroalimentación de la evidencia:** En la captura observé [el listado de `config/` con `settings/` y sin `settings.py`].
+**Retroalimentación de la evidencia:** En la captura observé el listado de `config/` con `settings/` y sin `settings.py`.
 
 **Conclusión y aprendizaje:** Aprendí que la configuración debe vivir en un solo lugar. Tener `settings.py` y un paquete `settings/` a la vez generaría dudas sobre cuál se carga.
 
@@ -209,7 +209,7 @@ python -c "import secrets; print(secrets.token_urlsafe(50))"
 y la pegué en `DJANGO_SECRET_KEY` dentro de `.env`.
 
 ![EVI-01-05 - .env.example y .env](trazabilidad/EVI-01-05.png)
-**Retroalimentación de la evidencia:** En la captura observé [los dos archivos en el listado] y el contenido de `.env.example`, que solo tiene nombres de variables y valores vacíos. Los valores reales de `.env` no aparecen en la captura.
+**Retroalimentación de la evidencia:** En la captura observé los dos archivos en el listado y el contenido de `.env.example`, que solo tiene nombres de variables y valores vacíos. Los valores reales de `.env` no aparecen en la captura.
 
 **Conclusión y aprendizaje:** Aprendí a separar la plantilla, que sí se versiona, del archivo con credenciales reales, que no se versiona. Así el repositorio documenta qué variables se necesitan sin exponer contraseñas.
 
@@ -313,7 +313,7 @@ EOF
 
 ![EVI-01-06 - config/database.py](trazabilidad/EVI-01-06.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [la función `database_from_environ` y la lista `ALLOWED_ENGINES` con los cuatro motores].
+**Retroalimentación de la evidencia:** En la captura observé la función `database_from_environ` y la lista `ALLOWED_ENGINES` con los cuatro motores.
 
 **Conclusión y aprendizaje:** Aprendí que el ORM no conoce el motor real: solo ve el alias `default`. La elección ocurre antes, con una función que puedo probar sin conectarme a ningún servidor.
 
@@ -412,7 +412,7 @@ EOF
 
 ![EVI-01-07 - config/settings/__init__.py](trazabilidad/EVI-01-07.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los imports de `dotenv` y `database_from_environ`, y la línea `DATABASES = database_from_environ(os.environ)`].
+**Retroalimentación de la evidencia:** En la captura observé los imports de `dotenv` y `database_from_environ`, y la línea `DATABASES = database_from_environ(os.environ)`.
 
 **Conclusión y aprendizaje:** Aprendí que el orden importa: `load_dotenv` debe ejecutarse antes de leer `SECRET_KEY` y `DATABASES`. Si no, Django arranca con valores vacíos.
 
@@ -453,7 +453,7 @@ EOF
 
 ![EVI-01-08 - config/project_python.py](trazabilidad/EVI-01-08.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el archivo creado y la función `use_project_python`].
+**Retroalimentación de la evidencia:** En la captura observé el archivo creado y la función `use_project_python`.
 
 **Conclusión y aprendizaje:** Aprendí que `sys.prefix` identifica el entorno activo. Por eso comparo esa ruta y no la del ejecutable, que en `.venv` es un enlace al Python del sistema.
 
@@ -538,7 +538,7 @@ EOF
 
 ![EVI-01-09 - manage.py, wsgi.py y asgi.py reescritos](trazabilidad/EVI-01-09.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`use_project_python()` y `load_dotenv()` en `manage.py`, y `load_dotenv()` antes de `get_wsgi_application()` y `get_asgi_application()`].
+**Retroalimentación de la evidencia:** En la captura observé `use_project_python()` y `load_dotenv()` en `manage.py`, y `load_dotenv()` antes de `get_wsgi_application()` y `get_asgi_application()`.
 
 **Conclusión y aprendizaje:** Aprendí que `load_dotenv()` debe ejecutarse antes de que Django lea la configuración. Reescribir los archivos completos evita dejar restos de código generado que no coincidan con el resto del proyecto.
 
@@ -575,7 +575,7 @@ DB_ENGINE=mysql MYSQL_DB= python manage.py check
 
 | AC | Criterio | Verificación | Evidencia | Resultado |
 |:---|:---|:---|:---|:---|
-| AC-01-01 | Cada motor produce su `ENGINE` documentado | Inspección de `database.py`; prueba automatizada desde ISS-03 | EVI-01-06 | [PASS ] |
+| AC-01-01 | Cada motor produce su `ENGINE` documentado | Inspección de `database.py`; prueba automatizada desde ISS-03 | EVI-01-06 | [PASS] |
 | AC-01-02 | Un motor desconocido falla con `ImproperlyConfigured` | `DB_ENGINE=motor_falso python manage.py check` | EVI-01-11 | [PASS] |
 | AC-01-03 | Una variable obligatoria vacía falla antes de conectar | `DB_ENGINE=mysql MYSQL_DB= python manage.py check` | EVI-01-12 | [PASS] |
 | AC-01-04 | El DSN de Oracle contiene `SERVICE_NAME` | Inspección de `_oracle` en `database.py` | EVI-01-06 | [PASS] |
@@ -609,7 +609,7 @@ EOF
 
 ![EVI-02-02 - Estructura de apps generada con startapp](trazabilidad/EVI-02-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los directorios `client`, `product` y `sale` dentro de `apps/`, con `__init__.py`, `apps.py`, `models.py`, `admin.py` y `views.py`].
+**Retroalimentación de la evidencia:** En la captura observé los directorios `client`, `product` y `sale` dentro de `apps/`, con `__init__.py`, `apps.py`, `models.py`, `admin.py` y `views.py`.
 
 **Conclusión y aprendizaje:** Aprendí que `startapp` genera el esqueleto de cada aplicación. `urls.py` no aparece porque todavía no hay endpoints.
 
@@ -702,7 +702,7 @@ EOF
 
 ![EVI-03-01 - apps/common/status.py](./trazabilidad/EVI-03-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el contenido de `status.py` con las clases `ACTIVE` e `INACTIVE`].
+**Retroalimentación de la evidencia:** En la captura observé el contenido de `status.py` con las clases `ACTIVE` e `INACTIVE`.
 
 **Conclusión y aprendizaje:** Aprendí que `TextChoices` guarda el valor en la base de datos y el nombre legible en el formulario, así `status` tiene valores controlados desde el principio.
 
@@ -724,7 +724,7 @@ class SecurityConfig(AppConfig):
 EOF
 ```
 ![EVI-03-02 - apps.py de security](trazabilidad/EVI-03-02.png)
-**Retroalimentación de la evidencia:** En la captura observé [`name = "apps.security"` y `label = "security"` en `apps.py`].
+**Retroalimentación de la evidencia:** En la captura observé `name = "apps.security"` y `label = "security"` en `apps.py`.
 
 **Conclusión y aprendizaje:** Aprendí que el `label` es el nombre que usa `AUTH_USER_MODEL` (`security.User`), así que debe coincidir.
 
@@ -784,7 +784,7 @@ EOF
 ```
 
 ![EVI-03-03 - models.py con User](./trazabilidad/EVI-03-03.png)
-**Retroalimentación de la evidencia:** En la captura observé [la clase `User(AbstractUser)`, `email` con `unique=True` y el `save()` que sincroniza `is_active` con `status`].
+**Retroalimentación de la evidencia:** En la captura observé la clase `User(AbstractUser)`, `email` con `unique=True` y el `save()` que sincroniza `is_active` con `status`.
 
 **Conclusión y aprendizaje:** Aprendí que `status` manda sobre `is_active`. Mantengo `is_active` porque Django y las autenticaciones lo consultan para decidir si una cuenta puede entrar. `create_superuser` fuerza `status = active` para que `save()` no desactive al superusuario.
 
@@ -810,7 +810,7 @@ AUTH_USER_MODEL = "security.User"
 ```
 
 ![EVI-03-04 - INSTALLED_APPS y AUTH_USER_MODEL](./trazabilidad/EVI-03-04.png)
-**Retroalimentación de la evidencia:** En la captura observé [`apps.security.apps.SecurityConfig` en `INSTALLED_APPS` y `AUTH_USER_MODEL = "security.User"` debajo de `DATABASES`].
+**Retroalimentación de la evidencia:** En la captura observé `apps.security.apps.SecurityConfig` en `INSTALLED_APPS` y `AUTH_USER_MODEL = "security.User"` debajo de `DATABASES`.
 
 **Conclusión y aprendizaje:** Aprendí que `AUTH_USER_MODEL` debe declararse antes de la primera migración. Si se cambia después, Django no puede reemplazar la tabla de usuarios sin rehacer la base.
 
@@ -900,7 +900,7 @@ python manage.py test apps.security.tests.DatabaseSelectionTests
 ![EVI-03-06 - makemigrations y migrate](./trazabilidad/EVI-03-06.png)
 
 ![EVI-03-07 - Pruebas de selección de motor en PASS](./trazabilidad/EVI-03-07.png)
-**Retroalimentación de las evidencias:** En la primera captura observé [`Create model User` y la aplicación de `security.0001_initial`]. En la segunda observé [`Ran 6 tests` y `OK`].
+**Retroalimentación de las evidencias:** En la primera captura observé `Create model User` y la aplicación de `security.0001_initial`. En la segunda observé `Ran 6 tests` y `OK`.
 
 **Conclusión y aprendizaje:** Aprendí que la migración la genera Django a partir del modelo, así que el archivo refleja `AUTH_USER_MODEL`. Si hubiera migrado antes de fijar `AUTH_USER_MODEL`, esta tabla no habría sido la del usuario personalizado.
 
@@ -940,7 +940,7 @@ EOF
 ```
 
 ![EVI-04-01 - apps/common/models.py](./trazabilidad/EVI-04-01.png)
-**Retroalimentación de la evidencia:** En la captura observé [`TimeStampedModel` con `created_at`, `updated_at` y `abstract = True`].
+**Retroalimentación de la evidencia:** En la captura observé `TimeStampedModel` con `created_at`, `updated_at` y `abstract = True`.
 
 **Conclusión y aprendizaje:** Aprendí que un modelo abstracto sirve para repetir campos comunes sin crear una tabla propia.
 
@@ -988,7 +988,7 @@ EOF
 ```
 
 ![EVI-04-02 - apps/client/models.py](./trazabilidad/EVI-04-02.png)
-**Retroalimentación de la evidencia:** En la captura observé [los campos de la especificación, `numero_documento` con `unique=True` y `db_table = "clientes"`].
+**Retroalimentación de la evidencia:** En la captura observé los campos de la especificación, `numero_documento` con `unique=True` y `db_table = "clientes"`.
 
 **Conclusión y aprendizaje:** Aprendí que `choices` restringe los valores permitidos en Django y que la unicidad de `numero_documento` la impone la base de datos.
 
@@ -1001,7 +1001,7 @@ python manage.py migrate client
 
 ![EVI-04-03 - makemigrations y migrate de client](./trazabilidad/EVI-04-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Client` y `Applying client.0001_initial... OK`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Client` y `Applying client.0001_initial... OK`.
 
 **Conclusión y aprendizaje:** Aprendí que la migración la genera Django a partir del modelo, así que el archivo refleja los campos y el nombre de tabla definidos.
 
@@ -1032,7 +1032,7 @@ except IntegrityError as e:
 Escribe `exit()` al terminar.
 
 ![EVI-04-04 - Shell con is_active, timestamps y documento duplicado](./trazabilidad/EVI-04-04.png)
-**Retroalimentación de la evidencia:** En la captura observé [`True`, la fecha de creación y `ana@ejemplo.com` en el bloque 1; `rechazado:` con la violación de unicidad de `numero_documento` en el bloque 2].
+**Retroalimentación de la evidencia:** En la captura observé `True`, la fecha de creación y `ana@ejemplo.com` en el bloque 1; `rechazado:` con la violación de unicidad de `numero_documento` en el bloque 2.
 
 **Conclusión y aprendizaje:** Aprendí que `is_active` toma `True` por defecto y que `save()` normaliza el email antes de guardarlo.
 
@@ -1099,7 +1099,7 @@ EOF
 
 ![EVI-05-01 - apps/product/models.py](./trazabilidad/EVI-05-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el campo `sku` con `unique=True`, `precio` con `MinValueValidator` y la restricción `producto_precio_no_negativo`].
+**Retroalimentación de la evidencia:** En la captura observé el campo `sku` con `unique=True`, `precio` con `MinValueValidator` y la restricción `producto_precio_no_negativo`.
 
 **Conclusión y aprendizaje:** Aprendí que la validación de Python protege los formularios, y la `CheckConstraint` impide precios negativos aunque alguien escriba directo en la base.
 
@@ -1112,7 +1112,7 @@ python manage.py migrate product
 
 ![EVI-05-02 - makemigrations y migrate de product](./trazabilidad/EVI-05-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Product` y `Applying product.0001_initial... OK`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Product` y `Applying product.0001_initial... OK`.
 
 **Conclusión y aprendizaje:** Aprendí que el nombre de la tabla `productos` queda definido en `Meta`, no en el nombre de la clase.
 
@@ -1152,7 +1152,7 @@ except IntegrityError as e:
 Escribe `exit()` al terminar.
 
 ![EVI-05-03 - Shell con SKU normalizado, duplicado y precio negativo](./trazabilidad/EVI-05-03.png)
-**Retroalimentación de la evidencia:** En la captura observé [`AGUA-600 True` en el bloque 1, `sku duplicado:` en el bloque 2 y `precio negativo:` en el bloque 3].
+**Retroalimentación de la evidencia:** En la captura observé `AGUA-600 True` en el bloque 1, `sku duplicado:` en el bloque 2 y `precio negativo:` en el bloque 3.
 
 **Conclusión y aprendizaje:** Aprendí que `save()` normaliza el SKU, que la unicidad y la restricción de precio las aplica la base de datos.
 
@@ -1219,7 +1219,7 @@ ls apps/branch
 
 ![EVI-06-01 - apps/branch: apps.py y models.py](./trazabilidad/EVI-06-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`name = "apps.branch"`, `label = "branch"` y la clase `Sucursal` con `db_table = "sucursales"`].
+**Retroalimentación de la evidencia:** En la captura observé `name = "apps.branch"`, `label = "branch"` y la clase `Sucursal` con `db_table = "sucursales"`.
 
 **Conclusión y aprendizaje:** Aprendí que el `label` corto es el que usan las migraciones, mientras que el `name` completo es el que Django necesita para localizar el paquete.
 
@@ -1286,7 +1286,7 @@ python manage.py check
 
 ![EVI-06-02 - INSTALLED_APPS con branch e inventory, y check sin errores](./trazabilidad/EVI-06-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`apps.branch.apps.BranchConfig` y `apps.inventory.apps.InventoryConfig` en `INSTALLED_APPS`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `apps.branch.apps.BranchConfig` y `apps.inventory.apps.InventoryConfig` en `INSTALLED_APPS`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `Inventario` depende de `Sucursal` y de `Product`, así que las aplicaciones deben existir antes de la migración.
 
@@ -1424,7 +1424,7 @@ EOF
 
 ![EVI-06-03 - apps/sale/managers.py y apps/sale/models.py](./trazabilidad/EVI-06-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Venta` con `estado` y `void()`, `VentaDetalle` con `valor_unitario` y el `save()` que calcula `total`].
+**Retroalimentación de la evidencia:** En la captura observé `Venta` con `estado` y `void()`, `VentaDetalle` con `valor_unitario` y el `save()` que calcula `total`.
 
 **Conclusión y aprendizaje:** Aprendí que el precio se congela en la línea, y que la anulación cambia el inventario y el estado dentro de una sola transacción.
 
@@ -1440,7 +1440,7 @@ python manage.py showmigrations branch inventory sale
 
 ![EVI-06-04 - makemigrations y migrate](./trazabilidad/EVI-06-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Sucursal`, `Create model Inventario`, `Create model Venta`, `Create model VentaDetalle` y `[X] 0001_initial` en `branch`, `inventory` y `sale`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Sucursal`, `Create model Inventario`, `Create model Venta`, `Create model VentaDetalle` y `[X] 0001_initial` en `branch`, `inventory` y `sale`.
 
 **Conclusión y aprendizaje:** Aprendí que `sale` depende de `inventory` y de `branch`, y Django ordena las migraciones por esas dependencias.
 
@@ -1517,7 +1517,7 @@ python manage.py test apps.branch apps.sale -v 2
 ```
 
 ![EVI-06-05 - Pruebas de Sucursal y Venta en PASS](./trazabilidad/EVI-06-05.png)
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las pruebas de `SucursalTests` y `VentaTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las pruebas de `SucursalTests` y `VentaTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que una sola prueba puede demostrar dos decisiones de diseño: el precio congelado y la restitución del inventario al anular.
 
@@ -1551,7 +1551,7 @@ cat requirements.txt
 
 ![EVI-07-01 - Paquetes instalados y requirements.txt](./trazabilidad/EVI-07-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`djangorestframework==3.17.2`, `djangorestframework-camel-case==1.4.2` y `django-cors-headers==4.9.0` en `requirements.txt`].
+**Retroalimentación de la evidencia:** En la captura observé `djangorestframework==3.17.2`, `djangorestframework-camel-case==1.4.2` y `django-cors-headers==4.9.0` en `requirements.txt`.
 
 **Conclusión y aprendizaje:** Aprendí que `djangorestframework-camel-case` solo actúa en el borde HTTP: el ORM sigue usando `created_at`, y la API envía `createdAt`.
 
@@ -1593,7 +1593,7 @@ python manage.py check
 
 ![EVI-07-02 - Settings con DRF, CORS y camelCase, y check sin errores](./trazabilidad/EVI-07-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`rest_framework` y `corsheaders` en `INSTALLED_APPS`, `CorsMiddleware` antes de `SecurityMiddleware`, `REST_FRAMEWORK` con los renderizadores camelCase y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `rest_framework` y `corsheaders` en `INSTALLED_APPS`, `CorsMiddleware` antes de `SecurityMiddleware`, `REST_FRAMEWORK` con los renderizadores camelCase y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `CorsMiddleware` debe ir antes de `CommonMiddleware` y de las respuestas de vistas, para que el navegador reciba los encabezados de CORS también en las peticiones de preflight.
 
@@ -1636,7 +1636,7 @@ EOF
 
 ![EVI-07-03 - apps/client/serializers.py](./trazabilidad/EVI-07-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los campos de la especificación en `fields`, `read_only_fields` con `id`, `created_at` y `updated_at`, y los métodos de validación de documento y email].
+**Retroalimentación de la evidencia:** En la captura observé los campos de la especificación en `fields`, `read_only_fields` con `id`, `created_at` y `updated_at`, y los métodos de validación de documento y email.
 
 **Conclusión y aprendizaje:** Aprendí que `read_only_fields` impide que un cliente envíe `id` o marcas de tiempo, y que la validación del serializer ocurre antes de tocar la base.
 
@@ -1686,7 +1686,7 @@ EOF
 
 ![EVI-07-04 - Serializers de Sucursal y Producto](./trazabilidad/EVI-07-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`SucursalSerializer` y `ProductSerializer` con sus campos, y `validate_sku` que devuelve el valor en mayúsculas].
+**Retroalimentación de la evidencia:** En la captura observé `SucursalSerializer` y `ProductSerializer` con sus campos, y `validate_sku` que devuelve el valor en mayúsculas.
 
 **Conclusión y aprendizaje:** Aprendí que el serializer es el lugar para reglas de presentación y normalización del contrato de la API, mientras que el modelo protege la integridad de los datos.
 
@@ -1732,7 +1732,7 @@ EOF
 
 ![EVI-07-05 - Serializers de Venta y VentaDetalle](./trazabilidad/EVI-07-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`VentaDetalleSerializer` con `valor_unitario` y `total` de solo lectura, y `VentaSerializer` con `detalles` anidados de solo lectura].
+**Retroalimentación de la evidencia:** En la captura observé `VentaDetalleSerializer` con `valor_unitario` y `total` de solo lectura, y `VentaSerializer` con `detalles` anidados de solo lectura.
 
 **Conclusión y aprendizaje:** Aprendí que el precio histórico no puede venir del cliente: el serializer lo expone, pero no lo acepta como entrada.
 
@@ -1765,7 +1765,7 @@ Escribe `exit()` al terminar.
 
 ![EVI-07-06 - JSON en camelCase y validación del serializer](./trazabilidad/EVI-07-06.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [las claves `createdAt`, `numeroDocumento` e `isActive` en el JSON del bloque 1, y `False` con el error de `nombre` en el bloque 2].
+**Retroalimentación de la evidencia:** En la captura observé las claves `createdAt`, `numeroDocumento` e `isActive` en el JSON del bloque 1, y `False` con el error de `nombre` en el bloque 2.
 
 **Conclusión y aprendizaje:** Aprendí que `serializer.data` tiene `snake_case` y que la conversión a `camelCase` ocurre al renderizar la respuesta HTTP.
 
@@ -1819,7 +1819,7 @@ cat apps/client/views.py
 
 ![EVI-08-01 - apps/client/views.py](./trazabilidad/EVI-08-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`ClientViewSet` con `AllowAny`, el filtro `is_active` en `get_queryset` y `perform_destroy` que cambia `is_active` a `False`].
+**Retroalimentación de la evidencia:** En la captura observé `ClientViewSet` con `AllowAny`, el filtro `is_active` en `get_queryset` y `perform_destroy` que cambia `is_active` a `False`.
 
 **Conclusión y aprendizaje:** Aprendí que `ModelViewSet` genera list, create, retrieve, update, partial_update y destroy a partir del serializer. Sobrescribir `perform_destroy` cambia el borrado sin tocar la ruta.
 
@@ -1849,7 +1849,7 @@ python manage.py check
 
 ![EVI-08-02 - config/urls.py con el router de clientes y check sin errores](./trazabilidad/EVI-08-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`router.register("clientes", ...)`, `include(router.urls)` bajo `api/` y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `router.register("clientes", ...)`, `include(router.urls)` bajo `api/` y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `SimpleRouter` genera `clientes/` y `clientes/<int:pk>/` a partir del ViewSet, sin escribir cada ruta a mano.
 
@@ -1919,7 +1919,7 @@ python manage.py test apps.client -v 2
 
 ![EVI-08-04 - Pruebas de cliente en PASS](./trazabilidad/EVI-08-04.png)
 
-**Retroalimentación de las evidencias:** En la primera captura observé [las cuatro pruebas de `ClientApiTests`]. En la segunda observé [`Ran 4 tests` y `OK`, con cada prueba listada como `ok`].
+**Retroalimentación de las evidencias:** En la primera captura observé las cuatro pruebas de `ClientApiTests`. En la segunda observé `Ran 4 tests` y `OK`, con cada prueba listada como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que `APITestCase` ejecuta las peticiones contra la misma pila que usa el servidor, así que valida el parser, el renderizador, las validaciones y el router juntos.
 
@@ -1972,7 +1972,7 @@ cat apps/product/views.py
 
 ![EVI-09-01 - apps/product/views.py](./trazabilidad/EVI-09-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`ProductoViewSet` con `AllowAny`, el filtro `is_active` en `get_queryset` y `perform_destroy` que desactiva el registro].
+**Retroalimentación de la evidencia:** En la captura observé `ProductoViewSet` con `AllowAny`, el filtro `is_active` en `get_queryset` y `perform_destroy` que desactiva el registro.
 
 **Conclusión y aprendizaje:** Aprendí que el mismo patrón sirve para Cliente y Producto: cambian el queryset y el serializer, pero la regla de baja lógica se conserva.
 
@@ -2004,7 +2004,7 @@ python manage.py check
 
 ![EVI-09-02 - config/urls.py con clientes y productos](./trazabilidad/EVI-09-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los dos `register` (`clientes` y `productos`) y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé los dos `register` (`clientes` y `productos`) y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `SimpleRouter` produce `productos/` y `productos/<int:pk>/`, y que `basename` nombra las rutas aunque el queryset cambie.
 
@@ -2063,7 +2063,7 @@ python manage.py test apps.product -v 2
 
 ![EVI-09-04 - Pruebas de producto en PASS](./trazabilidad/EVI-09-04.png)
 
-**Retroalimentación de las evidencias:** En la primera captura observé [las cuatro pruebas de `ProductoApiTests`]. En la segunda observé [`Ran 4 tests` y `OK`, con cada prueba listada como `ok`].
+**Retroalimentación de las evidencias:** En la primera captura observé las cuatro pruebas de `ProductoApiTests`. En la segunda observé `Ran 4 tests` y `OK`, con cada prueba listada como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la normalización del SKU ocurre en el serializer y que la restricción de precio protege la API antes de llegar a la base.
 
@@ -2121,7 +2121,7 @@ python manage.py check
 
 ![EVI-10-01 - ProductoDisponibleListAPIView en views.py](./trazabilidad/EVI-10-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los imports de `ListAPIView` y `ValidationError`, y la clase con el filtro sobre `inventario__cantidad__gt=0` y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé los imports de `ListAPIView` y `ValidationError`, y la clase con el filtro sobre `inventario__cantidad__gt=0` y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `ListAPIView` ofrece solo el método GET sobre un queryset, así que no hay un camino de escritura en esta ruta.
 
@@ -2154,7 +2154,7 @@ python manage.py check
 
 ![EVI-10-02 - Ruta de disponibles antes del router](./trazabilidad/EVI-10-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`api/productos/disponibles/` antes de `include(router.urls)`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `api/productos/disponibles/` antes de `include(router.urls)`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el orden de `urlpatterns` decide qué vista atiende una URL, y que una ruta literal debe ir antes que una ruta con convertidor.
 
@@ -2197,7 +2197,7 @@ python manage.py test apps.product -v 2
 
 ![EVI-10-03 - Pruebas de disponibles en PASS](./trazabilidad/EVI-10-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 7 tests` y `OK`, con las tres pruebas de `ProductoDisponibleTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 7 tests` y `OK`, con las tres pruebas de `ProductoDisponibleTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la disponibilidad depende de la sucursal: la misma consulta devuelve resultados distintos según el parámetro.
 
@@ -2308,7 +2308,7 @@ EOF
 
 ![EVI-11-01 - apps/sale/managers.py con register](./trazabilidad/EVI-11-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`register` con `transaction.atomic()`, `select_for_update()` sobre `Inventario` ordenado por producto, la creación de líneas con `valor_unitario=producto.precio` y el descuento de inventario].
+**Retroalimentación de la evidencia:** En la captura observé `register` con `transaction.atomic()`, `select_for_update()` sobre `Inventario` ordenado por producto, la creación de líneas con `valor_unitario=producto.precio` y el descuento de inventario.
 
 **Conclusión y aprendizaje:** Aprendí que la invariante vive en el manager: cualquier vista o comando que llame `Venta.objects.register` obtiene las mismas reglas. Si una validación o un `save` falla, la excepción revierte todo el bloque.
 
@@ -2403,7 +2403,7 @@ python manage.py check
 
 ![EVI-11-02 - apps/sale/serializers.py con registro](./trazabilidad/EVI-11-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`VentaRegistroSerializer` con `items` no vacío, `impuestos` no negativo, y la conversión de `ValidationError` del manager a respuesta 400; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `VentaRegistroSerializer` con `items` no vacío, `impuestos` no negativo, y la conversión de `ValidationError` del manager a respuesta 400; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el serializer valida la forma de la petición y el manager valida la regla de negocio. Así la misma validación protege también a otros llamadores.
 
@@ -2455,7 +2455,7 @@ python manage.py check
 
 ![EVI-11-03 - Vista y ruta de registro](./trazabilidad/EVI-11-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`VentaRegistroAPIView` con solo `post`, y `api/ventas/` registrada antes de `include(router.urls)`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `VentaRegistroAPIView` con solo `post`, y `api/ventas/` registrada antes de `include(router.urls)`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que una `APIView` que solo define `post` responde 405 a cualquier otro verbo. La ruta literal no entra en conflicto con el router porque `ventas` no está registrado en él.
 
@@ -2575,7 +2575,7 @@ python manage.py test apps.sale -v 2
 
 ![EVI-11-04 - Pruebas de registro de venta en PASS](./trazabilidad/EVI-11-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `VentaRegistroTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 5 tests` y `OK`, con las cinco pruebas de `VentaRegistroTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la prueba de rollback confirma la atomicidad real: el fallo ocurre después de crear la venta y de crear dos líneas, y la base queda sin nada.
 
@@ -2640,7 +2640,7 @@ cat apps/sale/views.py
 
 ![EVI-12-01 - apps/sale/views.py con lectura y anulación](./trazabilidad/EVI-12-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`VentaRegistroAPIView` con `get` y `post`, `VentaReadViewSet` sin create ni update, y `perform_destroy` que llama a `instance.void()`].
+**Retroalimentación de la evidencia:** En la captura observé `VentaRegistroAPIView` con `get` y `post`, `VentaReadViewSet` sin create ni update, y `perform_destroy` que llama a `instance.void()`.
 
 **Conclusión y aprendizaje:** Aprendí que `DELETE` no ejecuta `QuerySet.delete()`. La venta es evidencia contable, así que la anulación es un cambio de estado con reposición de inventario, no un borrado.
 
@@ -2680,7 +2680,7 @@ python manage.py check
 
 ![EVI-12-02 - config/urls.py con detalle y anulación](./trazabilidad/EVI-12-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`api/ventas/<int:pk>/` con `get` y `delete`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `api/ventas/<int:pk>/` con `get` y `delete`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `as_view` con un diccionario fija qué método HTTP llama a qué acción. Sin ese diccionario, el viewset no sabría qué responder a cada verbo.
 
@@ -2746,7 +2746,7 @@ Antes de ejecutar, agrega los imports que usan estas pruebas en la cabecera de `
 
 ![EVI-12-03 - Pruebas de lectura y anulación en PASS](./trazabilidad/EVI-12-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 8 tests` y `OK`, con las tres pruebas de `VentaLecturaTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 8 tests` y `OK`, con las tres pruebas de `VentaLecturaTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que anular dos veces produce el mismo estado: la segunda llamada encuentra la venta `ANULADA` y `void()` regresa sin tocar el inventario.
 
@@ -2763,7 +2763,7 @@ El GATE del ISS-12 queda cumplido cuando AC-12-01 a AC-12-04 están en PASS.
 
 ## ISS-13 - Django Admin
 
-En este ISS registré en el admin de Django los modelos de PuntoStock: Cliente, Sucursal, Producto, Inventario y Venta. Cada lista tiene filtros, búsqueda y orden. El admin sirve para consultar y corregir datos de catálogo y clientes; no reemplaza la API. Las ventas no se modifican desde el admin: su única vía de cambio es `POST` para registrar y `DELETE` para anular, porque así se mantienen el precio histórico y el inventario.
+En este ISS registré en el admin de Django los modelos de PuntoStock: Cliente, Sucursal, Producto, Inventario y Venta. Cada lista tiene filtros, búsqueda y orden. El admin sirve para consultar y corregir datos de catálogo y clientes; no reemplaza la API. Las ventas no se modifican desde el admin: su única vía de cambio es `POST` para registrar y `DELETE` para anular, porque así se mantienen el precio histórico y el inventario. Esta adaptación cambia el conjunto de modelos de StoreLab: `ProductType` no existe en PuntoStock; `ProductSale` corresponde a `VentaDetalle`, y `Sucursal` e `Inventario` son entidades adicionales. El cambio afecta al proyecto y a esta bitácora, no a la página de la guía académica.
 
 ### Paso 1 - Superusuario
 
@@ -2778,7 +2778,7 @@ Django pide usuario, correo y contraseña dos veces. Los validadores rechazan un
 
 ![EVI-13-01 - createsuperuser completado](./trazabilidad/EVI-13-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Superuser created successfully.` y el usuario que escribí, sin mostrar la contraseña].
+**Retroalimentación de la evidencia:** En la captura observé `Superuser created successfully.` y el usuario que escribí, sin mostrar la contraseña.
 
 **Conclusión y aprendizaje:** Aprendí que el admin usa sesión y CSRF, no JWT. Por eso el superusuario no pasa por la autenticación de la API.
 
@@ -2918,7 +2918,7 @@ python manage.py check
 
 ![EVI-13-02 - admin.py de client, branch, product, inventory y sale, y check](./trazabilidad/EVI-13-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los cinco `@admin.register` y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé los cinco `@admin.register` y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `@admin.register` deja el modelo en el registro del admin, y que `check` valida los campos listados antes de arrancar el servidor.
 
@@ -2941,9 +2941,9 @@ En el navegador, entra a `http://127.0.0.1:8000/admin/`, inicia sesión y abre C
 
 ![EVI-13-03 - Modelos registrados en el admin](./trazabilidad/EVI-13-03.png)
 
-![EVI-13-04 - Lista de Ventas con filtro y ficha de solo lectura](./trazabilidad/EVI-13-04.png)
+![EVI-13-04 - Lista de Ventas con filtro de estado](./trazabilidad/EVI-13-04.png)
 
-**Retroalimentación de las evidencias:** En la primera captura observé [`client.Client`, `branch.Sucursal`, `product.Product`, `inventory.Inventario` y `sale.Venta` en la lista]. En la segunda observé [la lista de ventas con el filtro por estado, y la ficha de una venta sin botones de guardar ni eliminar].
+**Retroalimentación de las evidencias:** En la primera captura observé `client.Client`, `branch.Sucursal`, `product.Product`, `inventory.Inventario` y `sale.Venta` en la lista. En la segunda observé la lista de ventas con el filtro por estado y sin acción de añadir en el menú. El código de EVI-13-02 muestra los campos de solo lectura y bloquea alta y borrado; no hay una captura de la ficha abierta.
 
 **Conclusión y aprendizaje:** Aprendí que el registro del admin confirma qué modelos están expuestos, y que la ficha de solo lectura confirma la regla de integridad en la interfaz.
 
@@ -2953,7 +2953,7 @@ En el navegador, entra a `http://127.0.0.1:8000/admin/`, inicia sesión y abre C
 |:---|:---|:---|:---|:---|
 | AC-13-01 | Los cinco modelos están registrados con lista, filtros y búsqueda | Paso 4 (registro) | EVI-13-02, EVI-13-03 | [PASS] |
 | AC-13-02 | `cantidad` de Inventario es de solo lectura | Paso 2 y Paso 3 | EVI-13-02 | [PASS] |
-| AC-13-03 | Una venta no se crea, no se edita y no se borra desde el admin | Ficha de solo lectura | EVI-13-04 | [PASS] |
+| AC-13-03 | Una venta no se crea, no se edita y no se borra desde el admin | `has_add_permission`, `has_delete_permission` y `readonly_fields` | EVI-13-02; EVI-13-04 | [PASS] |
 | AC-13-04 | `check` pasa sin errores con los cinco `admin.py` | Paso 2 | EVI-13-02 | [PASS] |
 
 El GATE del ISS-13 queda cumplido cuando AC-13-01 a AC-13-04 están en PASS.
@@ -2973,7 +2973,7 @@ cat requirements.txt
 
 ![EVI-14-01 - drf-spectacular==0.30.0 en requirements.txt](./trazabilidad/EVI-14-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`drf-spectacular==0.30.0` en `requirements.txt`].
+**Retroalimentación de la evidencia:** En la captura observé `drf-spectacular==0.30.0` en `requirements.txt`.
 
 **Conclusión y aprendizaje:** Aprendí que el nombre en pip es `drf-spectacular` con guion, pero en Python se importa como `drf_spectacular` con guion bajo.
 
@@ -3006,7 +3006,7 @@ python manage.py check
 
 ![EVI-14-02 - settings con drf_spectacular y check sin errores](./trazabilidad/EVI-14-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`"drf_spectacular"` en `INSTALLED_APPS`, `DEFAULT_SCHEMA_CLASS` dentro de `REST_FRAMEWORK`, `SPECTACULAR_SETTINGS` al final y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `"drf_spectacular"` en `INSTALLED_APPS`, `DEFAULT_SCHEMA_CLASS` dentro de `REST_FRAMEWORK`, `SPECTACULAR_SETTINGS` al final y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `DEFAULT_SCHEMA_CLASS` le dice a DRF qué generador usar para cada vista, y que `SERVE_PERMISSIONS` controla quién puede abrir el esquema, no quién puede usar la API.
 
@@ -3050,7 +3050,7 @@ python manage.py check
 
 ![EVI-14-03 - config/urls.py con las rutas del esquema](./trazabilidad/EVI-14-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`api/schema/`, `api/schema/swagger-ui/` y `api/schema/redoc/` antes de las rutas de negocio, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `api/schema/`, `api/schema/swagger-ui/` y `api/schema/redoc/` antes de las rutas de negocio, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que las rutas del esquema pertenecen al proyecto, no a una aplicación, porque describen la API completa.
 
@@ -3153,7 +3153,7 @@ python manage.py check
 
 ![EVI-14-04 - Anotaciones extend_schema en product y sale](./trazabilidad/EVI-14-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`extend_schema` en `ProductoDisponibleListAPIView.get`, `VentaRegistroAPIView.get` y `VentaRegistroAPIView.post`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `extend_schema` en `ProductoDisponibleListAPIView.get`, `VentaRegistroAPIView.get` y `VentaRegistroAPIView.post`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `responses` describe la salida y `request` describe la entrada. Sin ellas, el esquema de `POST /api/ventas/` quedaría sin cuerpo.
 
@@ -3168,7 +3168,7 @@ echo "exit=$?"
 
 ![EVI-14-05 - spectacular --validate con exit=0](./trazabilidad/EVI-14-05.png)
 ![alt text](image-1.png)
-**Retroalimentación de la evidencia:** En la captura observé [la salida sin mensajes de error y `exit=0`]. Si aparecen advertencias como `unable to guess serializer`, anótalas y resuélvelas antes de tomar la captura.
+**Retroalimentación de la evidencia:** En la captura observé la salida sin mensajes de error y `exit=0`. Si aparecen advertencias como `unable to guess serializer`, anótalas y resuélvelas antes de tomar la captura.
 
 **Conclusión y aprendizaje:** Aprendí que `--validate` detecta esquemas que no se pueden generar, aunque la API funcione en el navegador.
 
@@ -3184,7 +3184,7 @@ Abre `http://127.0.0.1:8000/api/schema/swagger-ui/`. Deben aparecer los grupos `
 
 ![EVI-14-06 - Swagger UI con los endpoints de PuntoStock](./trazabilidad/EVI-14-06.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [la interfaz de Swagger con los endpoints de clientes, productos, disponibles y ventas, sin pedir token].
+**Retroalimentación de la evidencia:** En la captura observé la interfaz de Swagger con los endpoints de clientes, productos, disponibles y ventas, sin pedir token.
 
 **Conclusión y aprendizaje:** Aprendí que Swagger es una vista del esquema, no un cliente de la API: lo que muestra depende de las anotaciones y de la configuración del paso 2.
 
@@ -3250,7 +3250,7 @@ python -c "from apps.security.tokens import generate_refresh_value, hash_token; 
 
 ![EVI-15-01 - tokens.py y longitudes de valor y hash](./trazabilidad/EVI-15-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`apps/security/tokens.py` con las dos funciones, y la salida de longitudes con un valor de más de 60 caracteres y un hash de `64`].
+**Retroalimentación de la evidencia:** En la captura observé `apps/security/tokens.py` con las dos funciones, y la salida de longitudes con un valor de más de 60 caracteres y un hash de `64`.
 
 **Conclusión y aprendizaje:** Aprendí que SHA-256 da siempre 64 caracteres hexadecimales, sin importar la longitud del token original.
 
@@ -3286,7 +3286,7 @@ python manage.py check
 
 ![EVI-15-02 - SIMPLE_JWT en settings y check sin errores](./trazabilidad/EVI-15-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`rest_framework_simplejwt` en `INSTALLED_APPS`, `SIMPLE_JWT` con `ROTATE_REFRESH_TOKENS` en `False` y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `rest_framework_simplejwt` en `INSTALLED_APPS`, `SIMPLE_JWT` con `ROTATE_REFRESH_TOKENS` en `False` y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el nombre de instalación es `djangorestframework-simplejwt` y el de la aplicación es `rest_framework_simplejwt`. Desactivar la blacklist evita que la librería guarde una segunda tabla de tokens.
 
@@ -3399,7 +3399,7 @@ python manage.py check
 
 ![EVI-15-03 - models.py con RefreshToken](./trazabilidad/EVI-15-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`class RefreshToken` con `token_hash` único, `family_id`, `expires_at`, `revoked_at`, `replaced_by` y `db_table = "refresh_tokens"`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `class RefreshToken` con `token_hash` único, `family_id`, `expires_at`, `revoked_at`, `replaced_by` y `db_table = "refresh_tokens"`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `family_id` agrupa los tokens de una misma sesión, así que, si un refresh ya usado vuelve a aparecer, se puede revocar toda la familia. `is_usable` centraliza las condiciones que hacen válido un token.
 
@@ -3413,7 +3413,7 @@ python manage.py showmigrations security
 
 ![EVI-15-04 - makemigrations y migrate de security](./trazabilidad/EVI-15-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model RefreshToken` y `[X] 0002_refreshtoken` bajo `security`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model RefreshToken` y `[X] 0002_refreshtoken` bajo `security`.
 
 **Conclusión y aprendizaje:** Aprendí que la migración de `security` solo agrega una tabla, sin tocar `users`, porque el modelo de usuario ya estaba aplicado desde ISS-03.
 
@@ -3477,7 +3477,7 @@ python manage.py test apps.security.test_refresh -v 2
 
 ![EVI-15-05 - Pruebas de RefreshToken en PASS](./trazabilidad/EVI-15-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 3 tests` y `OK`, con las tres pruebas de `RefreshTokenTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 3 tests` y `OK`, con las tres pruebas de `RefreshTokenTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que probar el hash directamente, sin pasar por una API, confirma la regla de seguridad antes de que exista el login que la usa.
 
@@ -3591,7 +3591,7 @@ python manage.py check
 
 ![EVI-16-01 - Modelos de autorización en apps/security/models.py](./trazabilidad/EVI-16-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [las clases `HttpMethod`, `Role`, `RoleUser`, `Resource` y `ResourceRole`, con sus `UniqueConstraint` y el `status` por defecto `inactive`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé las clases `HttpMethod`, `Role`, `RoleUser`, `Resource` y `ResourceRole`, con sus `UniqueConstraint` y el `status` por defecto `inactive`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `ForeignKey` con `RESTRICT` impide borrar un rol o un recurso que tenga concesiones, así que la matriz no puede quedar con referencias huérfanas.
 
@@ -3605,7 +3605,7 @@ python manage.py showmigrations security
 
 ![EVI-16-02 - Migración de las tablas de autorización](./trazabilidad/EVI-16-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Role`, `Create model RoleUser`, `Create model Resource`, `Create model ResourceRole` y `[X]` en la última migración de `security`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Role`, `Create model RoleUser`, `Create model Resource`, `Create model ResourceRole` y `[X]` en la última migración de `security`.
 
 **Conclusión y aprendizaje:** Aprendí que las cuatro tablas dependen de `users` y de sí mismas, así que su migración va después de la de `security` que ya existe.
 
@@ -3656,7 +3656,7 @@ python manage.py test apps.security.test_rbac_models -v 2
 
 ![EVI-16-03 - Pruebas de restricciones RBAC en PASS](./trazabilidad/EVI-16-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `RbacModelTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 5 tests` y `OK`, con las cinco pruebas de `RbacModelTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que `transaction.atomic()` dentro de `assertRaises` permite seguir usando la misma prueba después de un `IntegrityError`, porque la transacción se revierte solo en ese bloque.
 
@@ -3670,7 +3670,7 @@ python manage.py shell -c "from django.urls import resolve; print(resolve('/api/
 
 ![EVI-16-04 - Patrones de ruta obtenidos con resolve](./trazabilidad/EVI-16-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`api/clientes/<str:pk>/` y `api/productos/disponibles/`, sin ningún id escrito en el patrón].
+**Retroalimentación de la evidencia:** En la captura observé `api/clientes/<str:pk>/` y `api/productos/disponibles/`, sin ningún id escrito en el patrón.
 
 **Conclusión y aprendizaje:** Aprendí que `Resource.route` debe guardar el patrón. Si guardara `api/clientes/1/`, el permiso solo valdría para ese registro y nunca para los demás.
 
@@ -3720,7 +3720,7 @@ python manage.py check
 
 ![EVI-17-01 - serializers de login y check sin errores](./trazabilidad/EVI-17-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`LoginSerializer` con `username` o `email` más `password` de solo escritura, `TokenPairSerializer` con los cuatro campos de respuesta, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `LoginSerializer` con `username` o `email` más `password` de solo escritura, `TokenPairSerializer` con los cuatro campos de respuesta, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `write_only=True` impide que la contraseña vuelva en la respuesta, y que `validate` exige una de las dos claves de identidad antes de consultar la base.
 
@@ -3798,7 +3798,7 @@ python manage.py check
 
 ![EVI-17-02 - auth_views.py con LoginAPIView](./trazabilidad/EVI-17-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`authentication_classes = []` y `permission_classes = [AllowAny]` en `LoginAPIView`, la búsqueda por username o email, y la condición que devuelve el mismo 401 para los tres casos fallidos; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `authentication_classes = []` y `permission_classes = [AllowAny]` en `LoginAPIView`, la búsqueda por username o email, y la condición que devuelve el mismo 401 para los tres casos fallidos; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `issue_refresh` guarda el hash y devuelve el valor en claro una sola vez, y que el access token de SimpleJWT no se persiste porque se verifica por firma.
 
@@ -3843,7 +3843,7 @@ python manage.py check
 
 ![EVI-17-03 - config/urls.py con api/auth/login/](./trazabilidad/EVI-17-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [la ruta `api/auth/login/` antes de `include(router.urls)`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé la ruta `api/auth/login/` antes de `include(router.urls)`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el orden de `urlpatterns` decide qué vista atiende cada ruta, y que la ruta del login no choca con el router porque `auth` no está registrado en él.
 
@@ -3927,7 +3927,7 @@ python manage.py test apps.security.test_auth -v 2
 
 ![EVI-17-04 - Pruebas de login en PASS](./trazabilidad/EVI-17-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `AuthFlowTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `AuthFlowTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la prueba del hash compara el refresh devuelto con lo guardado: la base no contiene el valor en claro, pero sí permite verificarlo con el mismo algoritmo.
 
@@ -4068,7 +4068,7 @@ python manage.py check
 
 ![EVI-18-01 - RefreshAPIView con rotación y revocación de familia](./trazabilidad/EVI-18-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`RefreshAPIView` con `select_for_update()`, la rama `replaced_by_id` que llama a `_revoke_family`, la rama de vencimiento que solo inactiva el token, y `token.replaced_by = nuevo` al rotar; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `RefreshAPIView` con `select_for_update()`, la rama `replaced_by_id` que llama a `_revoke_family`, la rama de vencimiento que solo inactiva el token, y `token.replaced_by = nuevo` al rotar; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el token viejo no se borra sino que queda marcado con `replaced_by`. Así, la presentación posterior sabe que es un reuso y no un token desconocido.
 
@@ -4115,7 +4115,7 @@ python manage.py check
 
 ![EVI-18-02 - config/urls.py con api/auth/refresh/](./trazabilidad/EVI-18-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`api/auth/refresh/` después de `api/auth/login/`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `api/auth/refresh/` después de `api/auth/login/`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el refresh es otro endpoint abierto. Su seguridad no depende de la ruta, sino de que el valor solo lo conoce quien hizo login.
 
@@ -4180,7 +4180,7 @@ python manage.py test apps.security.test_refresh_rotation -v 2
 
 ![EVI-18-03 - Pruebas de rotación y reuso en PASS](./trazabilidad/EVI-18-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 3 tests` y `OK`, con las tres pruebas de `RefreshRotationTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 3 tests` y `OK`, con las tres pruebas de `RefreshRotationTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que el vencimiento es distinto del reuso: un token vencido solo deja de servir, mientras que un token ya rotado indica que alguien más lo tiene.
 
@@ -4237,7 +4237,7 @@ python manage.py check
 
 ![EVI-19-01 - LogoutAPIView en auth_views.py](./trazabilidad/EVI-19-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`LogoutAPIView` con `authentication_classes = []`, la rama de token reemplazado que revoca la familia, la escritura de `status` y `revoked_at` en el resto de casos, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `LogoutAPIView` con `authentication_classes = []`, la rama de token reemplazado que revoca la familia, la escritura de `status` y `revoked_at` en el resto de casos, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que logout no borra la fila. La conserva inactiva para que un intento posterior con ese mismo valor se pueda reconocer y rechazar.
 
@@ -4254,7 +4254,7 @@ python manage.py check
 
 ![EVI-19-02 - config/urls.py con api/auth/logout/](./trazabilidad/EVI-19-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el import de `LogoutAPIView` y la ruta `api/auth/logout/` después de `api/auth/refresh/`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé el import de `LogoutAPIView` y la ruta `api/auth/logout/` después de `api/auth/refresh/`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que un `sed` con ancla sobre el nombre de la ruta evita reescribir `config/urls.py` completo cada vez que se agrega un endpoint.
 
@@ -4298,7 +4298,7 @@ python manage.py test apps.security.test_logout -v 2
 
 ![EVI-19-03 - Pruebas de logout en PASS](./trazabilidad/EVI-19-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 2 tests` y `OK`, con las dos pruebas de `LogoutTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 2 tests` y `OK`, con las dos pruebas de `LogoutTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que el logout no depende del access token: la prueba no envía ningún encabezado `Authorization` y aun así cierra la sesión.
 
@@ -4339,7 +4339,7 @@ python manage.py check
 
 ![EVI-20-01 - authentication.py con validación de status](./trazabilidad/EVI-20-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`PuntoStockJWTAuthentication` heredando de `JWTAuthentication`, y `get_user` que lanza `AuthenticationFailed` cuando `status` no es `active`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `PuntoStockJWTAuthentication` heredando de `JWTAuthentication`, y `get_user` que lanza `AuthenticationFailed` cuando `status` no es `active`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que la firma del JWT no basta: el usuario puede haber sido desactivado después de emitir el token, y esa revisión solo ocurre si la consulta la base en cada petición.
 
@@ -4355,7 +4355,7 @@ python manage.py check
 
 ![EVI-20-02 - REST_FRAMEWORK con DEFAULT_AUTHENTICATION_CLASSES](./trazabilidad/EVI-20-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`DEFAULT_AUTHENTICATION_CLASSES` apuntando a `PuntoStockJWTAuthentication`, y `DEFAULT_PERMISSION_CLASSES` todavía en `AllowAny`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `DEFAULT_AUTHENTICATION_CLASSES` apuntando a `PuntoStockJWTAuthentication`, y `DEFAULT_PERMISSION_CLASSES` todavía en `AllowAny`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que separar autenticación y permisos permite cambiar quién entra sin cambiar qué se permite. Como efecto, un Bearer vencido enviado a un endpoint abierto responde 401, aunque el endpoint no lo exija.
 
@@ -4395,7 +4395,7 @@ python manage.py check
 
 ![EVI-20-03 - ProfileSerializer y ProfileAPIView](./trazabilidad/EVI-20-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`ProfileSerializer` sin `password`, con `username` y `status` de solo lectura, y `ProfileAPIView` con `IsAuthenticated` que devuelve `request.user`; `grep` muestra una sola definición de `ProfileSerializer`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `ProfileSerializer` sin `password`, con `username` y `status` de solo lectura, y `ProfileAPIView` con `IsAuthenticated` que devuelve `request.user`; `grep` muestra una sola definición de `ProfileSerializer`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `http_method_names` cierra los verbos que el perfil no necesita. Un `ModelViewSet` de usuarios expondría `/api/users/<pk>/`, que es otro recurso con reglas de acceso propias.
 
@@ -4412,7 +4412,7 @@ python manage.py check
 
 ![EVI-20-04 - config/urls.py con api/auth/profile/](./trazabilidad/EVI-20-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el import de `ProfileAPIView` y la ruta `api/auth/profile/` después de `api/auth/logout/`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé el import de `ProfileAPIView` y la ruta `api/auth/profile/` después de `api/auth/logout/`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que las rutas de autenticación quedan en un solo archivo, lo que permite revisar el orden de los endpoints de un vistazo.
 
@@ -4472,7 +4472,7 @@ python manage.py test apps.security.test_profile -v 2
 
 ![EVI-20-05 - Pruebas del perfil en PASS](./trazabilidad/EVI-20-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `ProfileTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `ProfileTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la última prueba usa el mismo access token antes y después de desactivar al usuario: el token sigue siendo válido criptográficamente, pero el backend de autenticación lo rechaza.
 
@@ -4534,7 +4534,7 @@ python manage.py check
 
 ![EVI-21-01 - apps/security/permissions.py con HasResourceAccess](./trazabilidad/EVI-21-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [la clase `HasResourceAccess` con la comprobación de `status` del usuario, el filtro sobre `ResourceRole` que exige activo cada eslabón, y la comparación con `match.route`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé la clase `HasResourceAccess` con la comprobación de `status` del usuario, el filtro sobre `ResourceRole` que exige activo cada eslabón, y la comparación con `match.route`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que la comparación con `match.route` usa el patrón declarado en la URL (`api/clientes/<pk>/`) y no el valor concreto del id. Por eso una concesión sirve para todos los registros del recurso.
 
@@ -4605,7 +4605,7 @@ python manage.py test apps.security.test_permissions -v 2
 
 ![EVI-21-02 - Pruebas de HasResourceAccess en PASS](./trazabilidad/EVI-21-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `HasResourceAccessTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `HasResourceAccessTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que `subTest` permite reportar cuál eslabón falló sin cortar la prueba, y que restaurar cada estado al final evita que un caso afecte al siguiente.
 
@@ -4750,7 +4750,7 @@ python manage.py check
 
 ![EVI-22-01 - Vistas de negocio con IsAuthenticated y HasResourceAccess](./trazabilidad/EVI-22-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`permission_classes = [IsAuthenticated, HasResourceAccess]` en `ClientViewSet`, `ProductoViewSet`, `ProductoDisponibleListAPIView`, `VentaRegistroAPIView` y `VentaReadViewSet`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `permission_classes = [IsAuthenticated, HasResourceAccess]` en `ClientViewSet`, `ProductoViewSet`, `ProductoDisponibleListAPIView`, `VentaRegistroAPIView` y `VentaReadViewSet`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el orden de las clases importa: `IsAuthenticated` responde 401 si no hay identidad, y `HasResourceAccess` responde 403 si la identidad no tiene concesión. Si se invirtieran, un anónimo recibiría 403 en lugar de 401.
 
@@ -4767,7 +4767,7 @@ python manage.py check
 
 ![EVI-22-02 - DEFAULT_PERMISSION_CLASSES con IsAuthenticated](./trazabilidad/EVI-22-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`DEFAULT_PERMISSION_CLASSES` con `rest_framework.permissions.IsAuthenticated`, y `SERVE_PERMISSIONS` todavía con `AllowAny`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `DEFAULT_PERMISSION_CLASSES` con `rest_framework.permissions.IsAuthenticated`, y `SERVE_PERMISSIONS` todavía con `AllowAny`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que un permiso por defecto cerrado protege las vistas nuevas que se olviden de declarar su propio permiso. Las vistas abiertas deben decirlo explícitamente.
 
@@ -4818,7 +4818,7 @@ python manage.py check
 
 ![EVI-22-03 - apps/common/testing.py con helpers de concesión](./trazabilidad/EVI-22-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`from django.urls import resolve`, la importación de `Resource`, `ResourceRole`, `Role` y `RoleUser`, y las funciones `grant`, `grant_crud` y `grant_business`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `from django.urls import resolve`, la importación de `Resource`, `ResourceRole`, `Role` y `RoleUser`, y las funciones `grant`, `grant_crud` y `grant_business`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `grant` no inventa la ruta: la calcula con `resolve`, igual que el permiso. Si las dos cosas no usan el mismo patrón, la prueba fallaría por una razón que no es de negocio.
 
@@ -4892,7 +4892,7 @@ python manage.py test apps.client -v 2
 
 ![EVI-22-04 - Pruebas de cliente con autenticación en PASS](./trazabilidad/EVI-22-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `ClientApiTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `ClientApiTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la misma prueba de ISS-08 ahora demuestra dos cosas: el CRUD y la concesión. Si se quitara la línea de `grant_business`, las cuatro pruebas fallarían con 403.
 
@@ -4984,7 +4984,7 @@ python manage.py test apps.product -v 2
 
 ![EVI-22-05 - Pruebas de producto con autenticación en PASS](./trazabilidad/EVI-22-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 7 tests` y `OK`, con las cuatro pruebas de `ProductoApiTests` y las tres de `ProductoDisponibleTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 7 tests` y `OK`, con las cuatro pruebas de `ProductoApiTests` y las tres de `ProductoDisponibleTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la concesión también cubre la ruta `disponibles`, que no es un recurso del router. Sin esa concesión, la prueba de disponibles respondería 403 aunque el producto exista y tenga stock.
 
@@ -5159,7 +5159,7 @@ python manage.py test apps.sale -v 2
 
 ![EVI-22-06 - Pruebas de venta con autenticación en PASS](./trazabilidad/EVI-22-06.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 8 tests` y `OK`, con las cinco pruebas de `VentaRegistroTests` y las tres de `VentaLecturaTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 8 tests` y `OK`, con las cinco pruebas de `VentaRegistroTests` y las tres de `VentaLecturaTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la misma transacción de ISS-11 sigue válida con autenticación: el rollback se prueba igual, pero ahora el intento pasa primero por el permiso.
 
@@ -5197,7 +5197,7 @@ python manage.py test apps.security.test_rbac_business -v 2
 
 ![EVI-22-07 - Pruebas 403 y 401 en PASS](./trazabilidad/EVI-22-07.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 2 tests` y `OK`, con `test_missing_grant_is_403` y `test_missing_identity_is_401` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 2 tests` y `OK`, con `test_missing_grant_is_403` y `test_missing_identity_is_401` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que 401 y 403 significan cosas distintas: el primero dice quién no se identificó, y el segundo dice que la identidad no tiene permiso para esa operación.
 
@@ -5212,7 +5212,7 @@ python manage.py test apps.client apps.product apps.sale apps.security -v 2
 
 ![EVI-22-08 - Suite de negocio y seguridad en PASS](./trazabilidad/EVI-22-08.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el número total de tests de la suite, indicado por `Ran N tests`, y `OK`; y la lista de pruebas de `apps.security` (login, refresh, logout, perfil, RBAC y los dos casos de este ISS)].
+**Retroalimentación de la evidencia:** En la captura observé el número total de tests de la suite, indicado por `Ran N tests`, y `OK`; y la lista de pruebas de `apps.security` (login, refresh, logout, perfil, RBAC y los dos casos de este ISS).
 
 **Conclusión y aprendizaje:** Aprendí que la suite completa demuestra los tres accesos: OPEN en login, JWT con token en perfil y JWT con token más RBAC en el negocio.
 
@@ -5311,7 +5311,7 @@ python manage.py check
 
 ![EVI-23-01 - matrix_serializers.py con password write_only](./trazabilidad/EVI-23-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`password = serializers.CharField(write_only=True, required=False)`, los métodos `create` y `update` que llaman a `set_password`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `password = serializers.CharField(write_only=True, required=False)`, los métodos `create` y `update` que llaman a `set_password`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `write_only` evita que la contraseña aparezca en la respuesta, y que `set_password` la guarda como hash. Asignarla directamente como texto dejaría la clave legible en la base.
 
@@ -5384,7 +5384,7 @@ python manage.py check
 
 ![EVI-23-02 - matrix_views.py con baja lógica](./trazabilidad/EVI-23-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`MatrixViewSet` con `IsAuthenticated` y `HasResourceAccess`, `perform_destroy` que cambia `status` a `inactive`, y el `UserViewSet` que usa `save()` completo; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `MatrixViewSet` con `IsAuthenticated` y `HasResourceAccess`, `perform_destroy` que cambia `status` a `inactive`, y el `UserViewSet` que usa `save()` completo; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que una baja lógica en la matriz es más segura que un borrado: si el rol se borra, las concesiones quedan huérfanas; si se desactiva, la historia de quién tuvo acceso se conserva.
 
@@ -5401,7 +5401,7 @@ python manage.py check
 
 ![EVI-23-03 - config/urls.py con los cinco recursos de la matriz](./trazabilidad/EVI-23-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [los cinco `router.register` de la matriz debajo de clientes y productos, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé los cinco `router.register` de la matriz debajo de clientes y productos, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que un router con varios recursos mantiene todas las rutas en un solo lugar, lo que facilita revisar qué endpoints existen y cuáles exigen concesión.
 
@@ -5490,7 +5490,7 @@ python manage.py test apps.security.test_matrix -v 2
 
 ![EVI-23-04 - Prueba de la cadena de la matriz en PASS](./trazabilidad/EVI-23-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 2 tests` y `OK`, con `test_role_crud_and_soft_delete` y `test_user_role_resource_chain_controls_access` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 2 tests` y `OK`, con `test_role_crud_and_soft_delete` y `test_user_role_resource_chain_controls_access` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que el mismo usuario pasa de 403 a 200 solo cuando se completa la cadena, y que `POST /api/clientes/` sigue en 403 porque la concesión fue solo de `GET`.
 
@@ -5543,7 +5543,7 @@ python manage.py check
 
 ![EVI-24-01 - schema.py y ready() en SecurityConfig](./trazabilidad/EVI-24-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`PuntoStockJWTScheme` con `target_class` apuntando a `PuntoStockJWTAuthentication`, y `SecurityConfig.ready()` importando `schema`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `PuntoStockJWTScheme` con `target_class` apuntando a `PuntoStockJWTAuthentication`, y `SecurityConfig.ready()` importando `schema`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que drf-spectacular solo conoce una autenticación si su extensión está registrada. `ready()` es el lugar para cargarla, porque se ejecuta una vez al arrancar la aplicación.
 
@@ -5627,7 +5627,7 @@ python manage.py seed_rbac
 
 ![EVI-24-02 - seed_rbac ejecutado dos veces](./trazabilidad/EVI-24-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [la primera ejecución con `Nuevos:` mayor que cero, y la segunda con `Nuevos: 0`, lo que demuestra que el comando es idempotente].
+**Retroalimentación de la evidencia:** En la captura observé la primera ejecución con `Nuevos:` mayor que cero, y la segunda con `Nuevos: 0`, lo que demuestra que el comando es idempotente.
 
 **Conclusión y aprendizaje:** Aprendí que `resolve(sample).route` obtiene el patrón de la ruta, no la ruta de ejemplo. Por eso la concesión `GET api/clientes/<pk>/` sirve para cualquier cliente, y no solo para el id 1.
 
@@ -5662,7 +5662,7 @@ python manage.py test apps.security.test_seed -v 2
 
 ![EVI-24-03 - Prueba de la semilla en PASS](./trazabilidad/EVI-24-03.png)
 ![alt text](image.png)
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 1 test` y `OK`, con `test_seed_is_idempotent_and_uses_route_patterns` listada como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 1 test` y `OK`, con `test_seed_is_idempotent_and_uses_route_patterns` listada como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que un comando de carga debe poder repetirse sin efectos secundarios. Si no fuera idempotente, cada despliegue duplicaría permisos.
 
@@ -5678,7 +5678,7 @@ grep -n "bearerAuth" /tmp/puntostock-schema.yml
 
 ![EVI-24-04 - spectacular --validate con bearerAuth](./trazabilidad/EVI-24-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`exit=0` y la línea `bearerAuth` dentro del esquema generado].
+**Retroalimentación de la evidencia:** En la captura observé `exit=0` y la línea `bearerAuth` dentro del esquema generado.
 
 **Conclusión y aprendizaje:** Aprendí que `--validate` además de generar el esquema comprueba que cada componente esté bien formado, incluido el de autenticación.
 
@@ -5700,7 +5700,7 @@ Abre `http://127.0.0.1:8000/api/schema/swagger-ui/` y sigue este orden:
 
 ![EVI-24-05 - Swagger con Authorize y respuestas 200 y 401](./trazabilidad/EVI-24-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el perfil con 200 con Authorize activo, y el mismo GET de clientes con 401 sin token].
+**Retroalimentación de la evidencia:** En la captura observé el perfil con 200 con Authorize activo, y el mismo GET de clientes con 401 sin token.
 
 **Conclusión y aprendizaje:** Aprendí que el esquema Bearer no cambia la seguridad por sí mismo: solo permite enviar el token desde Swagger. La autorización la siguen decidiendo `IsAuthenticated` y `HasResourceAccess`.
 
@@ -5767,13 +5767,13 @@ python manage.py test apps.security.test_rbac_401_403 -v 2
 
 ![EVI-25-01 - test_rbac_401_403.py](./trazabilidad/EVI-25-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [el archivo con los dos métodos de `RbacTests`, uno con las aserciones 403 y 401, y el otro con el ciclo sobre los cuatro eslabones].
+**Retroalimentación de la evidencia:** En la captura observé el archivo con los dos métodos de `RbacTests`, uno con las aserciones 403 y 401, y el otro con el ciclo sobre los cuatro eslabones.
 
 **Conclusión y aprendizaje:** Aprendí que 401 y 403 no son intercambiables. Un 401 le dice al cliente que debe autenticarse; un 403 le dice que ya está autenticado y que no tiene permiso. Usar 403 para un token ausente confundiría al cliente y ocultaría un problema de sesión.
 
 ![EVI-25-02 - Pruebas 401 y 403 en PASS](./trazabilidad/EVI-25-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 2 tests` y `OK`, con `test_missing_grant_is_403_and_missing_identity_is_401` y `test_each_inactive_link_denies` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 2 tests` y `OK`, con `test_missing_grant_is_403_and_missing_identity_is_401` y `test_each_inactive_link_denies` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que el ciclo sobre los cuatro eslabones demuestra que la autorización exige la cadena completa: basta un eslabón apagado para que la respuesta sea 403.
 
@@ -5788,7 +5788,7 @@ python manage.py test apps -v 2
 
 ![EVI-25-03 - Suite completa en PASS](./trazabilidad/EVI-25-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran N tests` con el número real de tu ejecución, y `OK`]. Anota el número tal como aparece; no lo tomes de otra fuente.
+**Retroalimentación de la evidencia:** En la captura observé `Ran N tests` con el número real de tu ejecución, y `OK`. Anota el número tal como aparece; no lo tomes de otra fuente.
 
 **Conclusión y aprendizaje:** Aprendí que la suite completa protege contra regresiones: un cambio de autorización en un ISS posterior puede romper pruebas de un ISS anterior, y esta corrida lo detecta.
 
@@ -5842,10 +5842,10 @@ El GATE de la Fase II se considera superado cuando todas las filas de la tabla e
 | Autenticación | ISS-15 a ISS-20 | Completo (verificar ISS-20) | Refresh con hash, rotación, logout y perfil con JWT |
 | Autorización | ISS-21 a ISS-25 | Completo | `HasResourceAccess`, RBAC sobre el negocio, CRUD de la matriz, semilla y pruebas 401/403 |
 | Verificación multimotor | Transversal | Parcial | Probado en un motor; PostgreSQL, MySQL, SQL Server y Oracle pendientes de corrida completa (verificar) |
-| Alcance de la especificación | Compras y pagos | Pendiente | Proveedor, Compra, CompraDetalle, Pago mixto y Devolucion no construidos |
-| Compras | Anexo A | En construcción | Proveedor, Compra y CompraDetalle; recepción parcial que suma al inventario de la sucursal |
-| Pagos | Anexo A | En construcción | Pago polimórfico (venta o compra) y pagos mixtos en la venta |
-| Devoluciones | Anexo A | En construcción | Devolucion y DevolucionDetalle sobre líneas vendidas |
+| Extensión del dominio | Compras, pagos y devoluciones | Anexo A, fuera de ISS-00 a ISS-25 | Se documentan aparte para incluir las tablas de PuntoStock sin alterar la secuencia de los 26 ISS. |
+| Compras | Anexo A | Implementadas y documentadas | Proveedor, Compra y CompraDetalle; recepción parcial integrada al inventario y respaldada por EVI-A-01 a EVI-A-06 |
+| Pagos | Anexo A | Implementados y documentados | Pago polimórfico para venta o compra y pagos mixtos; respaldados por EVI-A-07 a EVI-A-09 |
+| Devoluciones | Anexo A | Diseño documentado; implementación pendiente | El checkout revisado no contiene `apps/returns/` ni las evidencias EVI-A-10 a EVI-A-14. |
 
 ## Decisiones y desviaciones
 
@@ -5869,16 +5869,16 @@ El GATE de la Fase II se considera superado cuando todas las filas de la tabla e
 | Ruta del patrón | `<pk>` | `<str:pk>` (DRF) y `<int:pk>` en `ventas` | Lo que genera `resolve()` |
 | Respuesta sin identidad o sin permiso | 403 | 401 sin identidad, 403 sin concesión | Diferencia exigida por ISS-25 |
 | Semilla RBAC | Manual | Comando `seed_rbac` con rutas resueltas | Repetible e idempotente |
-| Entidades de compra, pago y devolución | Fuera de la guía | No construidas | Pendiente de confirmar alcance con el profesor |
+| Entidades de compra, pago y devolución | Sin ISS independiente en la guía | Anexo A de PuntoStock | Se separan deliberadamente para incluir las tablas requeridas sin alterar los 26 ISS. |
 | Base de datos de Oracle | Nombre por defecto | `ORACLE_SERVICE_NAME` del cliente real | Depende de la instancia |
-| Entidades de compra, pago y devolución | Fuera de la guía | Construidas como Anexo A, fuera de la numeración de ISS | Extensión de la especificación; la guía no las incluye |
+
 | Sucursal en Compra | No aplica | `sucursal` en Compra | La recepción suma al inventario de una sucursal concreta |
 | Detalle de devolución | No aplica | `DevolucionDetalle` con referencia a la línea de venta | Validar cantidades por línea sin devolver más de lo vendido |
 | Pago polimórfico | No aplica | `referencia_tipo` y `referencia_id`, validada en servicio | Compra y venta comparten la tabla de pagos |
 
-## Anexo A - Compras (Proveedor, Compra y CompraDetalle)
+## Anexo A - Tablas complementarias de PuntoStock
 
-Este anexo extiende la especificación de PuntoStock con las entidades de compra. No forma parte de la numeración de la guía (ISS-00 a ISS-25). Agregué `Proveedor` como aplicación `supplier` y `Compra` y `CompraDetalle` como aplicación `purchase`. La recepción parcial se registra en `cantidad_recibida`, y la integración con el inventario llega en el paso A-02.
+Este anexo extiende la especificación de PuntoStock con tablas de compra, pago y devolución. Es una extensión deliberada fuera de ISS-00 a ISS-25 para incluir las entidades del proyecto sin alterar la secuencia de los 26 ISS. En el checkout revisado, `supplier`, `purchase` y `payment` están implementadas; las devoluciones quedan como diseño pendiente de integración y evidencia.
 
 ### Paso A-01 - Aplicaciones y registro
 
@@ -5913,7 +5913,7 @@ python manage.py check
 
 ![EVI-A-01 - Aplicaciones registradas y check sin errores](./trazabilidad/EVI-A-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`apps.supplier` y `apps.purchase` debajo de `apps.inventory`, y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `apps.supplier` y `apps.purchase` debajo de `apps.inventory`, y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `Compra` depende de `supplier`, `branch` y `product`, así que las aplicaciones de referencia deben estar registradas antes de las migraciones.
 
@@ -6051,7 +6051,7 @@ python manage.py check
 
 ![EVI-A-02 - Modelos de compra](./trazabilidad/EVI-A-02.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [las clases `Proveedor`, `Compra` y `CompraDetalle`, la restricción `compra_detalle_recibida_no_excede` y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé las clases `Proveedor`, `Compra` y `CompraDetalle`, la restricción `compra_detalle_recibida_no_excede` y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que `cantidad_recibida` separa lo pedido de lo recibido. Así una compra puede quedar parcial sin perder la cantidad original, y la base impide recibir más de lo pedido.
 
@@ -6065,7 +6065,7 @@ python manage.py showmigrations supplier purchase
 
 ![EVI-A-03 - Migraciones de supplier y purchase](./trazabilidad/EVI-A-03.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Proveedor`, `Create model Compra`, `Create model CompraDetalle` y `[X] 0001_initial` en ambas aplicaciones].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Proveedor`, `Create model Compra`, `Create model CompraDetalle` y `[X] 0001_initial` en ambas aplicaciones.
 
 **Conclusión y aprendizaje:** Aprendí que `purchase` depende de `supplier`, `branch` y `product`, y Django ordena la aplicación de las migraciones por esas dependencias.
 
@@ -6136,7 +6136,7 @@ python manage.py test apps.purchase -v 2
 
 ![EVI-A-04 - Pruebas de compra en PASS](./trazabilidad/EVI-A-04.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `CompraModelTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `CompraModelTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que las reglas de la compra se prueban directamente en el modelo, sin depender de una API que todavía no existe.
 
@@ -6224,7 +6224,7 @@ python manage.py check
 
 ![EVI-A-05 - apps/purchase/services.py con recibir_compra](./trazabilidad/EVI-A-05.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`recibir_compra` con validación de pendientes, `select_for_update()` sobre la compra y sus líneas, la suma al inventario con `get_or_create` y el cambio de estado a `PARCIAL` o `RECIBIDA`; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `recibir_compra` con validación de pendientes, `select_for_update()` sobre la compra y sus líneas, la suma al inventario con `get_or_create` y el cambio de estado a `PARCIAL` o `RECIBIDA`; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que la recepción es una operación de dos tablas (compra y inventario) que debe ser todo o nada. Si el inventario falla a mitad, la línea no debe quedar marcada como recibida.
 
@@ -6301,7 +6301,7 @@ python manage.py test apps.purchase.test_services -v 2
 
 ![EVI-A-06 - Pruebas de recepción en PASS](./trazabilidad/EVI-A-06.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `RecepcionCompraTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 4 tests` y `OK`, con las cuatro pruebas de `RecepcionCompraTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la prueba de reversión es la que demuestra la atomicidad: el fallo ocurre después de crear el registro de inventario, y la base queda exactamente como estaba antes de la recepción.
 
@@ -6373,7 +6373,7 @@ python manage.py showmigrations payment
 
 ![EVI-A-07 - Migración de payment](./trazabilidad/EVI-A-07.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Pago` y `[X] 0001_initial` bajo `payment`].
+**Retroalimentación de la evidencia:** En la captura observé `Create model Pago` y `[X] 0001_initial` bajo `payment`.
 
 **Conclusión y aprendizaje:** Aprendí que `referencia_tipo` con `referencia_id` permite un solo tipo de pago para dos entidades, a cambio de que la integridad se valide en el servicio y no en una clave foránea.
 
@@ -6455,7 +6455,7 @@ python manage.py check
 
 ![EVI-A-08 - apps/payment/services.py](./trazabilidad/EVI-A-08.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`registrar_pago` con validación de existencia, anulación y saldo pendiente; `registrar_pagos_mixtos` con la igualdad exacta contra el total; y `System check identified no issues (0 silenced).`].
+**Retroalimentación de la evidencia:** En la captura observé `registrar_pago` con validación de existencia, anulación y saldo pendiente; `registrar_pagos_mixtos` con la igualdad exacta contra el total; y `System check identified no issues (0 silenced).`.
 
 **Conclusión y aprendizaje:** Aprendí que el pago mixto necesita dos reglas: cada pago individual no puede superar el saldo, y la suma de todos debe ser exactamente el total. Con solo la primera regla, una venta podría quedar pagada a medias sin que nadie lo note.
 
@@ -6565,7 +6565,7 @@ python manage.py test apps.payment -v 2
 
 ![EVI-A-09 - Pruebas de pagos en PASS](./trazabilidad/EVI-A-09.png)
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `PagosTests` listadas como `ok`].
+**Retroalimentación de la evidencia:** En la captura observé `Ran 5 tests` y `OK`, con las cinco pruebas de `PagosTests` listadas como `ok`.
 
 **Conclusión y aprendizaje:** Aprendí que la misma regla de saldo sirve para ventas y compras. La prueba de venta anulada demuestra que el estado de la referencia también bloquea los pagos, no solo los montos.
 
@@ -6582,9 +6582,11 @@ python manage.py test apps.payment -v 2
 | AC-A-13 | Un pago no supera el saldo pendiente ni se aplica a una referencia anulada | Tests `test_payment_above_balance_is_rejected` y `test_cannot_pay_voided_sale` | EVI-A-09 | [PASS] |
 | AC-A-14 | El mismo servicio de pagos funciona para ventas y compras | Test `test_payment_on_purchase_uses_same_rules` | EVI-A-09 | [PASS] |
 
-### Paso A-10 - Aplicación `returns` y modelos
+### Paso A-10 - Diseño de la aplicación `returns` y sus modelos
 
-Creé la aplicación `returns` con `Devolucion` y `DevolucionDetalle`. Cada devolución pertenece a una venta, y cada línea apunta a una línea concreta de esa venta (`VentaDetalle`). El total de cada línea se calcula con el valor unitario congelado en la venta, no con el precio actual del producto.
+**Estado:** este bloque y A-11 a A-14 documentan la implementación prevista. El checkout revisado no contiene la aplicación returns ni las capturas EVI-A-10 a EVI-A-14; estos pasos no se presentan como implementados o probados.
+
+El diseño propone la aplicación `returns` con `Devolucion` y `DevolucionDetalle`. Cada devolución pertenece a una venta, y cada línea apunta a una línea concreta de esa venta (`VentaDetalle`). El total de cada línea se calcula con el valor unitario congelado en la venta, no con el precio actual del producto.
 
 ```bash
 mkdir -p apps/returns
@@ -6669,9 +6671,8 @@ EOF
 python manage.py check
 ```
 
-![EVI-A-10 - Modelos de devolución y registro de la aplicación](./trazabilidad/EVI-A-10.png)
+**Evidencia pendiente:** EVI-A-10 (captura no disponible en `trazabilidad/`).
 
-**Retroalimentación de la evidencia:** En la captura observé [`Devolucion` con `venta` como clave foránea y `DevolucionDetalle` con `venta_detalle`; la línea `apps.returns.apps.ReturnsConfig` en `INSTALLED_APPS`; y `System check identified no issues (0 silenced).`].
 
 **Conclusión y aprendizaje:** Aprendí que `related_name="devoluciones"` aparece en dos modelos distintos (`Venta` y `VentaDetalle`), y que cada uno lo usa para una relación diferente. Por eso es importante que el nombre describa la relación y no solo el modelo.
 
@@ -6683,15 +6684,14 @@ python manage.py migrate returns
 python manage.py showmigrations returns
 ```
 
-![EVI-A-11 - Migración de returns](./trazabilidad/EVI-A-11.png)
+**Evidencia pendiente:** EVI-A-11 (captura no disponible en `trazabilidad/`).
 
-**Retroalimentación de la evidencia:** En la captura observé [`Create model Devolucion`, `Create model DevolucionDetalle` y `[X] 0001_initial` bajo `returns`].
 
 **Conclusión y aprendizaje:** Aprendí que `returns` depende de `sale`, así que Django la migra después de `sale` aunque el comando sea `migrate returns`.
 
 ### Paso A-12 - Servicio de devolución
 
-Creé `apps/returns/services.py` con `registrar_devolucion`. La función bloquea la venta y sus líneas, verifica que la venta esté activa y que ninguna línea supere lo vendido menos lo ya devuelto, crea la devolución y devuelve la cantidad al inventario de la sucursal de la venta. Todo ocurre en una transacción.
+El servicio propuesto en `apps/returns/services.py` define `registrar_devolucion`. La función bloquea la venta y sus líneas, verifica que la venta esté activa y que ninguna línea supere lo vendido menos lo ya devuelto, crea la devolución y devuelve la cantidad al inventario de la sucursal de la venta. Todo ocurre en una transacción.
 
 ```bash
 cat > apps/returns/services.py <<'EOF'
@@ -6779,15 +6779,14 @@ EOF
 python manage.py check
 ```
 
-![EVI-A-12 - Servicio registrar_devolucion](./trazabilidad/EVI-A-12.png)
+**Evidencia pendiente:** EVI-A-12 (captura no disponible en `trazabilidad/`).
 
-**Retroalimentación de la evidencia:** En la captura observé [la verificación de que la venta esté activa, el cálculo de lo ya devuelto con `Sum`, la creación de la devolución dentro de la transacción y la suma al inventario de la sucursal de la venta; y `System check identified no issues (0 silenced).`].
 
 **Conclusión y aprendizaje:** Aprendí que la validación de "no devolver más de lo vendido" suma las devoluciones registradas de cada línea, no solo la cantidad de la línea. Así dos devoluciones parciales no pueden superar la cantidad original.
 
 ### Paso A-13 - Pruebas de devolución
 
-Escribí las pruebas en `apps/returns/test_services.py`. Cubren la devolución parcial, el rechazo de exceso, el acumulado entre devoluciones, la venta anulada y la reversión completa ante un fallo.
+Las pruebas propuestas en `apps/returns/test_services.py` cubren la devolución parcial, el rechazo de exceso, el acumulado entre devoluciones, la venta anulada y la reversión completa ante un fallo.
 
 ```bash
 cat > apps/returns/test_services.py <<'EOF'
@@ -6877,15 +6876,14 @@ EOF
 python manage.py test apps.returns -v 2
 ```
 
-![EVI-A-13 - Pruebas de devolución en PASS](./trazabilidad/EVI-A-13.png)
+**Evidencia pendiente:** EVI-A-13 (captura no disponible en `trazabilidad/`).
 
-**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `DevolucionTests` listadas como `ok`].
 
 **Conclusión y aprendizaje:** Aprendí que la prueba de acumulado es la que detecta el error más común: validar cada devolución contra la venta original, sin descontar las devoluciones anteriores.
 
 ### Paso A-14 - Registro en el admin
 
-Registré `Devolucion` en el admin como solo lectura, igual que Venta: las devoluciones se crean solo por el servicio.
+El registro propuesto deja `Devolucion` en el admin como solo lectura, igual que Venta: las devoluciones se crearían solo por el servicio.
 
 ```bash
 cat > apps/returns/admin.py <<'EOF'
@@ -6924,20 +6922,19 @@ wc -l apps/returns/admin.py
 python manage.py check
 ```
 
-![EVI-A-14 - Admin de devoluciones en solo lectura](./trazabilidad/EVI-A-14.png)
+**Evidencia pendiente:** EVI-A-14 (captura no disponible en `trazabilidad/`).
 
-**Retroalimentación de la evidencia:** En la captura observé [`DevolucionAdmin` con `has_add_permission` y `has_delete_permission` en `False`, y el inline de detalles en solo lectura; y `wc -l` con más de 20 líneas].
 
 **Conclusión y aprendizaje:** Aprendí que el admin de un modelo con reglas de negocio debe ser de solo lectura, porque cualquier cambio manual saltaría la validación de cantidades y el ajuste del inventario.
 
 ### Criterios de aceptación de A-10 a A-14
 
-Los criterios A-15 a A-19 quedan pendientes de verificación documental: en `trazabilidad/` todavía no están las capturas EVI-A-11 ni EVI-A-13. No se marcan PASS hasta incorporar esas evidencias.
+Los criterios A-15 a A-19 quedan pendientes de implementación y verificación: el checkout no contiene `apps/returns/` y tampoco están las capturas EVI-A-11 ni EVI-A-13.
 
 | AC | Criterio | Verificación | Evidencia | Resultado |
 |:---|:---|:---|:---|:---|
-| AC-A-15 | La tabla `devoluciones` y `devolucion_detalles` existen | Paso A-11 | Pendiente: EVI-A-11 | [PENDIENTE] |
-| AC-A-16 | Una devolución parcial suma al inventario y calcula el total con el precio de la venta | Test `test_partial_return_restores_inventory_and_total` | Pendiente: EVI-A-13 | [PENDIENTE] |
-| AC-A-17 | No se devuelve más de lo vendido, contando las devoluciones previas | Tests `test_cannot_return_more_than_sold` y `test_returns_accumulate_across_devoluciones` | Pendiente: EVI-A-13 | [PENDIENTE] |
-| AC-A-18 | Una venta anulada no admite devoluciones | Test `test_voided_sale_cannot_be_returned` | Pendiente: EVI-A-13 | [PENDIENTE] |
-| AC-A-19 | Un fallo al devolver inventario revierte la devolución completa | Test `test_failure_during_inventory_update_rolls_back` | Pendiente: EVI-A-13 | [PENDIENTE] |
+| AC-A-15 | La tabla `devoluciones` y `devolucion_detalles` existen | Paso A-11 | Pendiente de implementación; EVI-A-11 | [PENDIENTE] |
+| AC-A-16 | Una devolución parcial suma al inventario y calcula el total con el precio de la venta | Test `test_partial_return_restores_inventory_and_total` | Pendiente de implementación y pruebas; EVI-A-13 | [PENDIENTE] |
+| AC-A-17 | No se devuelve más de lo vendido, contando las devoluciones previas | Tests `test_cannot_return_more_than_sold` y `test_returns_accumulate_across_devoluciones` | Pendiente de implementación y pruebas; EVI-A-13 | [PENDIENTE] |
+| AC-A-18 | Una venta anulada no admite devoluciones | Test `test_voided_sale_cannot_be_returned` | Pendiente de implementación y pruebas; EVI-A-13 | [PENDIENTE] |
+| AC-A-19 | Un fallo al devolver inventario revierte la devolución completa | Test `test_failure_during_inventory_update_rolls_back` | Pendiente de implementación y pruebas; EVI-A-13 | [PENDIENTE] |
