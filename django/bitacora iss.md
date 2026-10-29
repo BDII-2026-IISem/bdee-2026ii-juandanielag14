@@ -4,7 +4,7 @@ En este ISS preparé el entorno aislado y creé el proyecto Django `config`, sin
 
 ### Paso 1 - Verificación de requisitos
 
-Verifiqué que tengo Python 3.12 y que el directorio del proyecto está vacío antes de crear el entorno.
+Verifiqué que el entorno usa Python 3.14.4 y que, antes de iniciar, `trazabilidad/` era la única carpeta existente. La guía oficial del ISS-00 pide Python 3.12; esta versión es una desviación que dejo declarada.
 
 ``` bash
 python3 --version
@@ -13,7 +13,7 @@ ls -la
 
 ![EVI-00-04 - Versión de Python y directorio vacío](./trazabilidad/EVI-00-04-requisitos.png)
 
-**Retroalimentación de la evidencia:** En la captura observé la versión `[3.12.x]` impresa por `python3 --version` y el directorio sin archivos previos [o con solo los archivos de carpeta oculta].
+**Retroalimentación de la evidencia:** En la captura observé `Python 3.14.4` impreso por `python3 --version` y que `trazabilidad/` era la única carpeta existente, sin código previo del proyecto.
 
 **Conclusión y aprendizaje:** Aprendí que el ISS exige una versión concreta de Python, porque Django 5.2 y sus dependencias se prueban sobre esa versión. Verificar el requisito antes de instalar evita errores difíciles de diagnosticar más adelante.
 
@@ -112,7 +112,7 @@ sudo apt install -y build-essential pkg-config default-libmysqlclient-dev python
 
 ![EVI-01-01 - Entorno virtual activo y dependencias del sistema](trazabilidad/EVI-01-01.png)
 
-**Retroalimentación de la evidencia:** En la captura observé el prompt con `(.venv)`, la ruta `[ruta exacta]/.venv/bin/python`, la versión `Python [3.14.x]` y la instalación de las dependencias del sistema sin errores.
+**Retroalimentación de la evidencia:** En la captura observé el prompt con `(.venv)`, la ruta `[ruta exacta]/.venv/bin/python`, la versión `Python 3.14.4` y la instalación de las dependencias del sistema sin errores.
 
 **Conclusión y aprendizaje:** Aprendí que `pip` y `python` deben apuntar al mismo entorno; de lo contrario, los drivers quedan instalados fuera del proyecto y `manage.py` no los encuentra.
 
@@ -910,12 +910,12 @@ python manage.py test apps.security.tests.DatabaseSelectionTests
 |:---|:---|:---|:---|:---|
 | AC-03-01 | `AUTH_USER_MODEL` apunta a `security.User` antes de migrar | Inspección de settings y orden de comandos | EVI-03-03, EVI-03-04 | [PASS] |
 | AC-03-02 | `Client` no tiene campo de contraseña | Revisión de `models.py` | EVI-03-02 | [PASS] |
-| AC-03-03 | Un usuario `inactive` no puede iniciar sesión | Prueba de login (pendiente) | — | [PENDIENTE] |
-| AC-03-04 | Una clave incorrecta no autentica | `check_password` (pendiente) | — | [PENDIENTE] |
+| AC-03-03 | Un usuario `inactive` no puede iniciar sesión | Test `test_inactive_user_gets_401` del ISS-17 | EVI-17-04 | [PASS] |
+| AC-03-04 | Una clave incorrecta no autentica | Test `test_wrong_password_gets_same_401` del ISS-17 | EVI-17-04 | [PASS] |
 
-Los criterios AC-03-03 y AC-03-04 requieren pruebas de autenticación que la guía del ISS-03 menciona pero no incluye. Se verifican cuando se implemente el login.
+La guía del ISS-03 no incluye las pruebas de autenticación; se completaron al implementar el login en ISS-17. EVI-17-04 muestra ambos casos en PASS.
 
-El GATE del ISS-03 queda cumplido cuando AC-03-01 y AC-03-02 están en PASS y las pruebas de selección de motor pasan.
+El GATE del ISS-03 queda cumplido cuando AC-03-01 a AC-03-04 están en PASS y las pruebas de selección de motor pasan. AC-03-03 y AC-03-04 se cerraron posteriormente en ISS-17.
 
 ## ISS-04 - Modelo Client (Cliente de PuntoStock)
 
@@ -3487,9 +3487,9 @@ python manage.py test apps.security.test_refresh -v 2
 |:---|:---|:---|:---|:---|
 | AC-15-01 | El valor guardado en `token_hash` es distinto del token en claro | Test `test_stored_hash_is_not_the_raw_token` | EVI-15-05 | [PASS] |
 | AC-15-02 | El hash coincide con SHA-256 del valor entregado | Test `test_hash_matches_sha256` | EVI-15-05 | [PASS] |
-| AC-15-03 | La respuesta de login no contiene `password` | Se verifica en el login del ISS-17 | — | [PENDIENTE] |
+| AC-15-03 | La respuesta de login no contiene `password` | Aserción `assertNotIn("password", response.data)` en `test_login_with_username_returns_tokens_and_stores_hash` del ISS-17 | EVI-17-04 | [PASS] |
 
-El GATE del ISS-15 queda cumplido cuando AC-15-01 y AC-15-02 están en PASS. AC-15-03 se completa en el ISS-17, cuando exista el endpoint de login.
+El GATE del ISS-15 queda cumplido cuando AC-15-01 a AC-15-03 están en PASS. AC-15-03 se cerró posteriormente en ISS-17, donde la respuesta de login se comprueba sin el campo `password`.
 
 ## ISS-16 - Role, RoleUser, Resource y ResourceRole
 
@@ -5829,3 +5829,1115 @@ echo "exit=$?"
 Oracle solo se marca PASS cuando corras las migraciones y la suite contra tu instancia. Si no lo has hecho, déjalo como PENDIENTE y dilo explícitamente en el informe.
 
 El GATE de la Fase II se considera superado cuando todas las filas de la tabla están en PASS, salvo Oracle, que puede quedar PENDIENTE si lo declaras.
+
+## Estado general
+
+| Fase | ISS | Estado | Observación |
+|:---|:---|:---|:---|
+| Entorno y settings | ISS-00 a ISS-01 | Completo | Python 3.14.4, Django 5.2.17, configuración por `DB_ENGINE` con los cuatro motores; Python difiere del requisito 3.12 de la guía |
+| Apps y usuario | ISS-02 a ISS-03 | Completo | `apps/` con `client`, `product`, `sale`, `branch`, `inventory`, `security` y `AUTH_USER_MODEL` |
+| Negocio: modelos | ISS-04 a ISS-07 | Completo | Cliente, Producto, Sucursal, Inventario, Venta, VentaDetalle y serializers |
+| Negocio: API | ISS-08 a ISS-12 | Completo | ViewSets, disponibles, registro transaccional, consulta y anulación |
+| Admin y OpenAPI | ISS-13 a ISS-14 | Completo | Admin de los modelos de negocio; esquema validado con `spectacular --validate` |
+| Autenticación | ISS-15 a ISS-20 | Completo (verificar ISS-20) | Refresh con hash, rotación, logout y perfil con JWT |
+| Autorización | ISS-21 a ISS-25 | Completo | `HasResourceAccess`, RBAC sobre el negocio, CRUD de la matriz, semilla y pruebas 401/403 |
+| Verificación multimotor | Transversal | Parcial | Probado en un motor; PostgreSQL, MySQL, SQL Server y Oracle pendientes de corrida completa (verificar) |
+| Alcance de la especificación | Compras y pagos | Pendiente | Proveedor, Compra, CompraDetalle, Pago mixto y Devolucion no construidos |
+| Compras | Anexo A | En construcción | Proveedor, Compra y CompraDetalle; recepción parcial que suma al inventario de la sucursal |
+| Pagos | Anexo A | En construcción | Pago polimórfico (venta o compra) y pagos mixtos en la venta |
+| Devoluciones | Anexo A | En construcción | Devolucion y DevolucionDetalle sobre líneas vendidas |
+
+## Decisiones y desviaciones
+
+| Tema | Guía (StoreLab) | PuntoStock | Motivo |
+|:---|:---|:---|:---|
+| Dominio | Client, Product, Sale | Cliente, Producto, Venta, con Sucursal e Inventario | Especificación del proyecto |
+| Tipo de producto y stock | `ProductType` y `stock` en Producto | Sin tipo; el stock vive en `Inventario` por sucursal | La especificación no los incluye |
+| Venta | `Sale` y `ProductSale` | `Venta` (con `sucursal`) y `VentaDetalle` | `Venta` depende de sucursal, y la anulación devuelve stock a `Inventario` |
+| Estado de Venta | `status` | `estado` con `ACTIVA` y `ANULADA` | Lectura directa de la especificación |
+| Estado de cliente, producto y sucursal | `status` | `is_active` | Campo de la especificación |
+| Estado de seguridad | `status` | `status` (`active` / `inactive`) con `is_active` sincronizado en `User` | RBAC y sesiones requieren estados explícitos |
+| Nombres de tablas | En inglés | En español con `db_table` (`clientes`, `productos`, `ventas`) | Coincidir con el diagrama |
+| Rutas de la API | `/api/clients/` | `/api/clientes/`, `/api/productos/`, `/api/ventas/` | Nombres de la narrativa del proyecto |
+| Ubicación de rutas | `apps/*/urls.py` | Un solo `config/urls.py` | Visibilidad de todas las rutas en un archivo |
+| Ubicación de pruebas | `tests.py` | Archivos `test_*.py` por tema | Separar pruebas de autenticación, RBAC y semilla |
+| Estructura de carpetas | `apps/` | `apps/` (no `features/business/`) | Mantener la estructura de la guía; confirmar con el profesor |
+| Permisos durante la Fase I | No aplica | `AllowAny` en negocio hasta ISS-22 | Evitar depender de RBAC antes de construirlo |
+| Refresh token | Tabla propia | Valor aleatorio guardado solo como SHA-256, con `family_id`, rotación y revocación de familia | Seguridad: el valor en claro nunca se guarda |
+| Access token | Sin definir | JWT de SimpleJWT, verificado por firma y vigencia, y con `status` del usuario revisado en cada petición | Un usuario desactivado debe perder acceso aunque su token sea válido |
+| Autorización | Permiso por rol | `HasResourceAccess` con la cadena `User → RoleUser → Role → ResourceRole → Resource`, por método y ruta | Coincidir con el RBAC de la especificación |
+| Ruta del patrón | `<pk>` | `<str:pk>` (DRF) y `<int:pk>` en `ventas` | Lo que genera `resolve()` |
+| Respuesta sin identidad o sin permiso | 403 | 401 sin identidad, 403 sin concesión | Diferencia exigida por ISS-25 |
+| Semilla RBAC | Manual | Comando `seed_rbac` con rutas resueltas | Repetible e idempotente |
+| Entidades de compra, pago y devolución | Fuera de la guía | No construidas | Pendiente de confirmar alcance con el profesor |
+| Base de datos de Oracle | Nombre por defecto | `ORACLE_SERVICE_NAME` del cliente real | Depende de la instancia |
+| Entidades de compra, pago y devolución | Fuera de la guía | Construidas como Anexo A, fuera de la numeración de ISS | Extensión de la especificación; la guía no las incluye |
+| Sucursal en Compra | No aplica | `sucursal` en Compra | La recepción suma al inventario de una sucursal concreta |
+| Detalle de devolución | No aplica | `DevolucionDetalle` con referencia a la línea de venta | Validar cantidades por línea sin devolver más de lo vendido |
+| Pago polimórfico | No aplica | `referencia_tipo` y `referencia_id`, validada en servicio | Compra y venta comparten la tabla de pagos |
+
+## Anexo A - Compras (Proveedor, Compra y CompraDetalle)
+
+Este anexo extiende la especificación de PuntoStock con las entidades de compra. No forma parte de la numeración de la guía (ISS-00 a ISS-25). Agregué `Proveedor` como aplicación `supplier` y `Compra` y `CompraDetalle` como aplicación `purchase`. La recepción parcial se registra en `cantidad_recibida`, y la integración con el inventario llega en el paso A-02.
+
+### Paso A-01 - Aplicaciones y registro
+
+Creé las dos aplicaciones y las registré en `INSTALLED_APPS`, después de `inventory`.
+
+```bash
+mkdir -p apps/supplier apps/purchase
+python manage.py startapp supplier apps/supplier
+python manage.py startapp purchase apps/purchase
+cat > apps/supplier/apps.py <<'EOF'
+from django.apps import AppConfig
+
+
+class SupplierConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.supplier"
+    label = "supplier"
+EOF
+cat > apps/purchase/apps.py <<'EOF'
+from django.apps import AppConfig
+
+
+class PurchaseConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.purchase"
+    label = "purchase"
+EOF
+sed -i '/"apps.inventory.apps.InventoryConfig",/a\    "apps.supplier.apps.SupplierConfig",\n    "apps.purchase.apps.PurchaseConfig",' config/settings/__init__.py
+grep -n "apps\." config/settings/__init__.py
+python manage.py check
+```
+
+![EVI-A-01 - Aplicaciones registradas y check sin errores](./trazabilidad/EVI-A-01.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`apps.supplier` y `apps.purchase` debajo de `apps.inventory`, y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que `Compra` depende de `supplier`, `branch` y `product`, así que las aplicaciones de referencia deben estar registradas antes de las migraciones.
+
+### Paso A-02 - Modelos Proveedor, Compra y CompraDetalle
+
+Escribí los modelos en sus aplicaciones. `Compra.recalcular_totales()` suma las líneas y aplica los impuestos. `CompraDetalle` impide que la cantidad recibida supere la cantidad pedida.
+
+```bash
+cat > apps/supplier/models.py <<'EOF'
+from django.core.validators import MinLengthValidator
+from django.db import models
+
+from apps.common.models import TimeStampedModel
+
+
+class Proveedor(TimeStampedModel):
+    nit = models.CharField(max_length=30, unique=True)
+    razon_social = models.CharField(max_length=150, validators=[MinLengthValidator(2)])
+    contacto = models.CharField(max_length=150, blank=True)
+    telefono = models.CharField(max_length=30, blank=True)
+    email = models.EmailField(max_length=150, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "proveedores"
+        verbose_name = "proveedor"
+        verbose_name_plural = "proveedores"
+        ordering = ["razon_social", "id"]
+
+    def __str__(self):
+        return self.razon_social
+
+    def save(self, *args, **kwargs):
+        self.nit = self.nit.strip()
+        if self.email:
+            self.email = self.email.strip().lower()
+        super().save(*args, **kwargs)
+EOF
+
+cat > apps/purchase/models.py <<'EOF'
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
+from django.db import models
+
+from apps.branch.models import Sucursal
+from apps.common.models import TimeStampedModel
+from apps.product.models import Product
+from apps.supplier.models import Proveedor
+
+
+class Compra(TimeStampedModel):
+    class Estado(models.TextChoices):
+        PENDIENTE = "PENDIENTE", "Pendiente"
+        PARCIAL = "PARCIAL", "Parcial"
+        RECIBIDA = "RECIBIDA", "Recibida"
+        ANULADA = "ANULADA", "Anulada"
+
+    proveedor = models.ForeignKey(
+        Proveedor, on_delete=models.RESTRICT, related_name="compras", db_column="proveedor_id"
+    )
+    sucursal = models.ForeignKey(
+        Sucursal, on_delete=models.RESTRICT, related_name="compras", db_column="sucursal_id"
+    )
+    fecha = models.DateTimeField()
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    impuestos = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.PENDIENTE)
+
+    class Meta:
+        db_table = "compras"
+        verbose_name = "compra"
+        verbose_name_plural = "compras"
+        ordering = ["-fecha", "-id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(subtotal__gte=0) & models.Q(impuestos__gte=0) & models.Q(total__gte=0),
+                name="compra_montos_no_negativos",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Compra {self.pk}"
+
+    def recalcular_totales(self):
+        subtotal = sum((linea.total for linea in self.detalles.all()), Decimal("0.00"))
+        self.subtotal = subtotal.quantize(Decimal("0.01"))
+        self.total = (self.subtotal + self.impuestos).quantize(Decimal("0.01"))
+        self.save(update_fields=["subtotal", "total", "updated_at"])
+
+
+class CompraDetalle(TimeStampedModel):
+    compra = models.ForeignKey(
+        Compra, on_delete=models.RESTRICT, related_name="detalles", db_column="compra_id"
+    )
+    producto = models.ForeignKey(
+        Product, on_delete=models.RESTRICT, related_name="lineas_compra", db_column="producto_id"
+    )
+    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    cantidad_recibida = models.PositiveIntegerField(default=0)
+    valor_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+    total = models.DecimalField(max_digits=12, decimal_places=2)
+    observaciones = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "compra_detalles"
+        verbose_name = "detalle de compra"
+        verbose_name_plural = "detalles de compra"
+        ordering = ["id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(cantidad_recibida__lte=models.F("cantidad")),
+                name="compra_detalle_recibida_no_excede",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(valor_unitario__gte=0) & models.Q(total__gte=0),
+                name="compra_detalle_montos_validos",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.producto} x {self.cantidad}"
+
+    @property
+    def pendiente(self):
+        return self.cantidad - self.cantidad_recibida
+
+    def save(self, *args, **kwargs):
+        self.total = (self.valor_unitario * self.cantidad).quantize(Decimal("0.01"))
+        super().save(*args, **kwargs)
+EOF
+python manage.py check
+```
+
+![EVI-A-02 - Modelos de compra](./trazabilidad/EVI-A-02.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [las clases `Proveedor`, `Compra` y `CompraDetalle`, la restricción `compra_detalle_recibida_no_excede` y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que `cantidad_recibida` separa lo pedido de lo recibido. Así una compra puede quedar parcial sin perder la cantidad original, y la base impide recibir más de lo pedido.
+
+### Paso A-03 - Migraciones
+
+```bash
+python manage.py makemigrations supplier purchase
+python manage.py migrate supplier purchase
+python manage.py showmigrations supplier purchase
+```
+
+![EVI-A-03 - Migraciones de supplier y purchase](./trazabilidad/EVI-A-03.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Create model Proveedor`, `Create model Compra`, `Create model CompraDetalle` y `[X] 0001_initial` en ambas aplicaciones].
+
+**Conclusión y aprendizaje:** Aprendí que `purchase` depende de `supplier`, `branch` y `product`, y Django ordena la aplicación de las migraciones por esas dependencias.
+
+### Paso A-04 - Pruebas de modelo
+
+Escribí las pruebas en `apps/purchase/test_models.py`. Verifican el total de la compra, la recepción parcial y el rechazo de recibir más de lo pedido.
+
+```bash
+cat > apps/purchase/test_models.py <<'EOF'
+from decimal import Decimal
+
+from django.db import IntegrityError, transaction
+from django.test import TestCase
+from django.utils import timezone
+
+from apps.branch.models import Sucursal
+from apps.product.models import Product
+from apps.purchase.models import Compra, CompraDetalle
+from apps.supplier.models import Proveedor
+
+
+class CompraModelTests(TestCase):
+    def setUp(self):
+        self.proveedor = Proveedor.objects.create(nit="900100", razon_social="Distribuidora Norte")
+        self.sucursal = Sucursal.objects.create(nombre="Centro")
+        self.producto = Product.objects.create(sku="ARROZ-1", nombre="Arroz", precio=Decimal("3000.00"))
+        self.compra = Compra.objects.create(
+            proveedor=self.proveedor,
+            sucursal=self.sucursal,
+            fecha=timezone.now(),
+            impuestos=Decimal("100.00"),
+        )
+
+    def test_total_includes_taxes(self):
+        CompraDetalle.objects.create(
+            compra=self.compra, producto=self.producto, cantidad=2, valor_unitario=Decimal("1500.00")
+        )
+        self.compra.recalcular_totales()
+        self.compra.refresh_from_db()
+        self.assertEqual(self.compra.subtotal, Decimal("3000.00"))
+        self.assertEqual(self.compra.total, Decimal("3100.00"))
+
+    def test_partial_reception_keeps_pending_quantity(self):
+        linea = CompraDetalle.objects.create(
+            compra=self.compra, producto=self.producto, cantidad=5, valor_unitario=Decimal("1000.00")
+        )
+        linea.cantidad_recibida = 2
+        linea.save(update_fields=["cantidad_recibida", "updated_at"])
+        linea.refresh_from_db()
+        self.assertEqual(linea.pendiente, 3)
+
+    def test_cannot_receive_more_than_ordered(self):
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            CompraDetalle.objects.create(
+                compra=self.compra,
+                producto=self.producto,
+                cantidad=2,
+                cantidad_recibida=3,
+                valor_unitario=Decimal("1000.00"),
+            )
+
+    def test_nit_is_unique(self):
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Proveedor.objects.create(nit="900100", razon_social="Otro proveedor")
+EOF
+python manage.py test apps.purchase -v 2
+```
+
+![EVI-A-04 - Pruebas de compra en PASS](./trazabilidad/EVI-A-04.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `CompraModelTests` listadas como `ok`].
+
+**Conclusión y aprendizaje:** Aprendí que las reglas de la compra se prueban directamente en el modelo, sin depender de una API que todavía no existe.
+
+### Criterios de aceptación del paso
+
+| AC | Criterio | Verificación | Evidencia | Resultado |
+|:---|:---|:---|:---|:---|
+| AC-A-01 | Las aplicaciones están registradas y `check` pasa | Paso A-01 | EVI-A-01, EVI-A-02 | [PASS] |
+| AC-A-02 | Las tablas `proveedores`, `compras` y `compra_detalles` existen | Paso A-03 | EVI-A-03 | [PASS] |
+| AC-A-03 | El total de la compra suma las líneas y los impuestos | Test `test_total_includes_taxes` | EVI-A-04 | [PASS] |
+| AC-A-04 | La recepción parcial conserva la cantidad pendiente | Test `test_partial_reception_keeps_pending_quantity` | EVI-A-04 | [PASS] |
+| AC-A-05 | No se puede recibir más de lo pedido | Test `test_cannot_receive_more_than_ordered` | EVI-A-04 | [PASS] |
+| AC-A-06 | El NIT del proveedor es único | Test `test_nit_is_unique` | EVI-A-04 | [PASS] |
+
+El paso A-01 a A-04 queda cumplido cuando AC-A-01 a AC-A-06 están en PASS. Los pasos siguientes del anexo agregan la recepción que suma al inventario (A-05), los pagos (A-06) y las devoluciones (A-07).
+
+### Paso A-05 - Recepción de compra que suma al inventario
+
+Creé `apps/purchase/services.py` con la función `recibir_compra`. Recibe la compra y una lista de recepciones (`detalle_id` y `cantidad`), valida que no se reciba más de lo pendiente, suma cada cantidad al inventario de la sucursal de la compra (creando el registro si no existe) y actualiza `cantidad_recibida`. El estado de la compra pasa a `PARCIAL` mientras queden pendientes y a `RECIBIDA` cuando todas las líneas estén completas. Todo ocurre en una sola transacción.
+
+```bash
+cat > apps/purchase/services.py <<'EOF'
+from django.core.exceptions import ValidationError
+from django.db import transaction
+
+from apps.inventory.models import Inventario
+from apps.purchase.models import Compra, CompraDetalle
+
+
+def recibir_compra(compra, recepciones):
+    if compra.estado == Compra.Estado.ANULADA:
+        raise ValidationError({"compra": ["La compra está anulada."]})
+    if not recepciones:
+        raise ValidationError({"recepciones": ["Debe indicar al menos una línea."]})
+
+    cantidades = {}
+    for item in recepciones:
+        cantidad = int(item["cantidad"])
+        if cantidad < 1:
+            raise ValidationError({"recepciones": ["La cantidad recibida debe ser al menos 1."]})
+        detalle_id = int(item["detalle_id"])
+        cantidades[detalle_id] = cantidades.get(detalle_id, 0) + cantidad
+
+    with transaction.atomic():
+        compra = Compra.objects.select_for_update().get(pk=compra.pk)
+        if not compra.sucursal.is_active:
+            raise ValidationError({"sucursal": ["La sucursal no está activa."]})
+
+        detalles = {
+            d.pk: d
+            for d in CompraDetalle.objects.select_for_update().filter(compra=compra, pk__in=cantidades)
+        }
+        if len(detalles) != len(cantidades):
+            raise ValidationError({"recepciones": ["Hay líneas que no pertenecen a esta compra."]})
+
+        for detalle_id, cantidad in cantidades.items():
+            detalle = detalles[detalle_id]
+            if cantidad > detalle.pendiente:
+                raise ValidationError(
+                    {"recepciones": [f"Se intenta recibir {cantidad} de {detalle.producto}, pendientes: {detalle.pendiente}."]}
+                )
+
+        for detalle_id in sorted(cantidades):
+            detalle = detalles[detalle_id]
+            cantidad = cantidades[detalle_id]
+            inventario, _ = Inventario.objects.get_or_create(
+                sucursal=compra.sucursal,
+                producto=detalle.producto,
+                defaults={"cantidad": 0},
+            )
+            inventario = Inventario.objects.select_for_update().get(pk=inventario.pk)
+            inventario.cantidad += cantidad
+            inventario.save(update_fields=["cantidad", "updated_at"])
+
+            detalle.cantidad_recibida += cantidad
+            detalle.save(update_fields=["cantidad_recibida", "updated_at"])
+
+        pendientes = sum(d.pendiente for d in compra.detalles.all())
+        compra.estado = Compra.Estado.RECIBIDA if pendientes == 0 else Compra.Estado.PARCIAL
+        compra.save(update_fields=["estado", "updated_at"])
+        return compra
+EOF
+python manage.py check
+```
+
+![EVI-A-05 - apps/purchase/services.py con recibir_compra](./trazabilidad/EVI-A-05.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`recibir_compra` con validación de pendientes, `select_for_update()` sobre la compra y sus líneas, la suma al inventario con `get_or_create` y el cambio de estado a `PARCIAL` o `RECIBIDA`; y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que la recepción es una operación de dos tablas (compra y inventario) que debe ser todo o nada. Si el inventario falla a mitad, la línea no debe quedar marcada como recibida.
+
+### Paso A-06 - Pruebas de recepción
+
+Escribí las pruebas en `apps/purchase/test_services.py`. Verifican la recepción parcial, la recepción completa, el rechazo de exceso y la reversión completa ante un fallo.
+
+```bash
+cat > apps/purchase/test_services.py <<'EOF'
+from decimal import Decimal
+from unittest.mock import patch
+
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+from django.utils import timezone
+
+from apps.branch.models import Sucursal
+from apps.inventory.models import Inventario
+from apps.product.models import Product
+from apps.purchase.models import Compra, CompraDetalle
+from apps.purchase.services import recibir_compra
+from apps.supplier.models import Proveedor
+
+
+class RecepcionCompraTests(TestCase):
+    def setUp(self):
+        self.proveedor = Proveedor.objects.create(nit="900200", razon_social="Lácteos del Sur")
+        self.sucursal = Sucursal.objects.create(nombre="Norte")
+        self.producto = Product.objects.create(sku="LECHE-2", nombre="Leche", precio=Decimal("3000.00"))
+        self.compra = Compra.objects.create(proveedor=self.proveedor, sucursal=self.sucursal, fecha=timezone.now())
+        self.linea = CompraDetalle.objects.create(
+            compra=self.compra, producto=self.producto, cantidad=5, valor_unitario=Decimal("1000.00")
+        )
+
+    def test_partial_reception_adds_inventory_and_sets_parcial(self):
+        recibir_compra(self.compra, [{"detalle_id": self.linea.pk, "cantidad": 2}])
+        inventario = Inventario.objects.get(sucursal=self.sucursal, producto=self.producto)
+        self.assertEqual(inventario.cantidad, 2)
+        self.compra.refresh_from_db()
+        self.assertEqual(self.compra.estado, Compra.Estado.PARCIAL)
+
+    def test_full_reception_sets_recibida(self):
+        recibir_compra(self.compra, [{"detalle_id": self.linea.pk, "cantidad": 2}])
+        recibir_compra(self.compra, [{"detalle_id": self.linea.pk, "cantidad": 3}])
+        inventario = Inventario.objects.get(sucursal=self.sucursal, producto=self.producto)
+        self.assertEqual(inventario.cantidad, 5)
+        self.compra.refresh_from_db()
+        self.assertEqual(self.compra.estado, Compra.Estado.RECIBIDA)
+
+    def test_over_reception_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            recibir_compra(self.compra, [{"detalle_id": self.linea.pk, "cantidad": 6}])
+        self.assertFalse(Inventario.objects.filter(sucursal=self.sucursal, producto=self.producto).exists())
+
+    def test_failure_during_inventory_update_rolls_back(self):
+        original = Inventario.save
+
+        def fail_on_stock(inventario, *args, **kwargs):
+            if "cantidad" in (kwargs.get("update_fields") or []):
+                raise RuntimeError("fallo al sumar inventario")
+            return original(inventario, *args, **kwargs)
+
+        with patch.object(Inventario, "save", fail_on_stock):
+            with self.assertRaises(RuntimeError):
+                recibir_compra(self.compra, [{"detalle_id": self.linea.pk, "cantidad": 2}])
+        self.linea.refresh_from_db()
+        self.compra.refresh_from_db()
+        self.assertEqual(self.linea.cantidad_recibida, 0)
+        self.assertEqual(self.compra.estado, Compra.Estado.PENDIENTE)
+        self.assertFalse(Inventario.objects.filter(sucursal=self.sucursal, producto=self.producto).exists())
+EOF
+python manage.py test apps.purchase.test_services -v 2
+```
+
+![EVI-A-06 - Pruebas de recepción en PASS](./trazabilidad/EVI-A-06.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Ran 4 tests` y `OK`, con las cuatro pruebas de `RecepcionCompraTests` listadas como `ok`].
+
+**Conclusión y aprendizaje:** Aprendí que la prueba de reversión es la que demuestra la atomicidad: el fallo ocurre después de crear el registro de inventario, y la base queda exactamente como estaba antes de la recepción.
+
+### Paso A-07 - Aplicación `payment` y migración
+
+Creé la aplicación `payment` con el modelo `Pago`. Una fila de pago apunta a una venta o a una compra mediante `referencia_tipo` y `referencia_id`. La base no puede verificar esa referencia porque apunta a dos tablas, así que la validación vive en el servicio del paso siguiente.
+
+```bash
+mkdir -p apps/payment
+python manage.py startapp payment apps/payment
+cat > apps/payment/apps.py <<'EOF'
+from django.apps import AppConfig
+
+
+class PaymentConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.payment"
+    label = "payment"
+EOF
+cat > apps/payment/models.py <<'EOF'
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
+from django.db import models
+
+from apps.common.models import TimeStampedModel
+
+
+class Pago(TimeStampedModel):
+    class ReferenciaTipo(models.TextChoices):
+        VENTA = "VENTA", "Venta"
+        COMPRA = "COMPRA", "Compra"
+
+    class Metodo(models.TextChoices):
+        EFECTIVO = "EFECTIVO", "Efectivo"
+        TARJETA = "TARJETA", "Tarjeta"
+        TRANSFERENCIA = "TRANSFERENCIA", "Transferencia"
+
+    class Estado(models.TextChoices):
+        APLICADO = "APLICADO", "Aplicado"
+        ANULADO = "ANULADO", "Anulado"
+
+    referencia_tipo = models.CharField(max_length=10, choices=ReferenciaTipo.choices)
+    referencia_id = models.PositiveIntegerField()
+    metodo = models.CharField(max_length=15, choices=Metodo.choices)
+    monto = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    fecha = models.DateTimeField()
+    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.APLICADO)
+
+    class Meta:
+        db_table = "pagos"
+        verbose_name = "pago"
+        verbose_name_plural = "pagos"
+        ordering = ["-fecha", "-id"]
+        indexes = [models.Index(fields=["referencia_tipo", "referencia_id"], name="pago_referencia_idx")]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(monto__gt=0), name="pago_monto_positivo"),
+        ]
+
+    def __str__(self):
+        return f"{self.referencia_tipo} {self.referencia_id} - {self.monto}"
+EOF
+sed -i '/"apps.purchase.apps.PurchaseConfig",/a\    "apps.payment.apps.PaymentConfig",' config/settings/__init__.py
+grep -n "apps\." config/settings/__init__.py
+python manage.py makemigrations payment
+python manage.py migrate payment
+python manage.py showmigrations payment
+```
+
+![EVI-A-07 - Migración de payment](./trazabilidad/EVI-A-07.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Create model Pago` y `[X] 0001_initial` bajo `payment`].
+
+**Conclusión y aprendizaje:** Aprendí que `referencia_tipo` con `referencia_id` permite un solo tipo de pago para dos entidades, a cambio de que la integridad se valide en el servicio y no en una clave foránea.
+
+### Paso A-08 - Servicio de pagos y pagos mixtos
+
+Creé `apps/payment/services.py`. `registrar_pago` valida que la referencia exista, que no esté anulada y que el monto no supere el saldo pendiente. `registrar_pagos_mixtos` registra varios pagos de una venta y exige que su suma sea exactamente el total de la venta, en una sola transacción.
+
+```bash
+cat > apps/payment/services.py <<'EOF'
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Sum
+
+from apps.payment.models import Pago
+from apps.purchase.models import Compra
+from apps.sale.models import Venta
+
+
+def _referencia(referencia_tipo, referencia_id):
+    modelo = {Pago.ReferenciaTipo.VENTA: Venta, Pago.ReferenciaTipo.COMPRA: Compra}.get(referencia_tipo)
+    if modelo is None:
+        raise ValidationError({"referencia_tipo": ["Tipo de referencia no válido."]})
+    try:
+        return modelo.objects.select_for_update().get(pk=referencia_id)
+    except modelo.DoesNotExist:
+        raise ValidationError({"referencia_id": ["No existe la referencia indicada."]})
+
+
+def registrar_pago(*, referencia_tipo, referencia_id, metodo, monto, fecha):
+    monto = Decimal(monto).quantize(Decimal("0.01"))
+    if monto <= 0:
+        raise ValidationError({"monto": ["El monto debe ser mayor que cero."]})
+    with transaction.atomic():
+        referencia = _referencia(referencia_tipo, referencia_id)
+        if referencia.estado == "ANULADA":
+            raise ValidationError({"referencia_id": ["La referencia está anulada."]})
+        pagado = (
+            Pago.objects.filter(
+                referencia_tipo=referencia_tipo,
+                referencia_id=referencia_id,
+                estado=Pago.Estado.APLICADO,
+            ).aggregate(total=Sum("monto"))["total"]
+            or Decimal("0.00")
+        )
+        saldo = referencia.total - pagado
+        if monto > saldo:
+            raise ValidationError({"monto": [f"El pago supera el saldo pendiente ({saldo})."]})
+        return Pago.objects.create(
+            referencia_tipo=referencia_tipo,
+            referencia_id=referencia_id,
+            metodo=metodo,
+            monto=monto,
+            fecha=fecha,
+        )
+
+
+def registrar_pagos_mixtos(*, venta, pagos, fecha):
+    suma = sum((Decimal(p["monto"]).quantize(Decimal("0.01")) for p in pagos), Decimal("0.00"))
+    if suma != venta.total:
+        raise ValidationError(
+            {"pagos": [f"La suma de los pagos ({suma}) debe ser igual al total de la venta ({venta.total})."]}
+        )
+    with transaction.atomic():
+        return [
+            registrar_pago(
+                referencia_tipo=Pago.ReferenciaTipo.VENTA,
+                referencia_id=venta.pk,
+                metodo=p["metodo"],
+                monto=p["monto"],
+                fecha=fecha,
+            )
+            for p in pagos
+        ]
+EOF
+python manage.py check
+```
+
+![EVI-A-08 - apps/payment/services.py](./trazabilidad/EVI-A-08.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`registrar_pago` con validación de existencia, anulación y saldo pendiente; `registrar_pagos_mixtos` con la igualdad exacta contra el total; y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que el pago mixto necesita dos reglas: cada pago individual no puede superar el saldo, y la suma de todos debe ser exactamente el total. Con solo la primera regla, una venta podría quedar pagada a medias sin que nadie lo note.
+
+### Paso A-09 - Pruebas de pagos
+
+Escribí las pruebas en `apps/payment/test_services.py`. Crean una venta real con el registro de ISS-11, para que el total y el inventario sean los del negocio.
+
+```bash
+cat > apps/payment/test_services.py <<'EOF'
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+from django.utils import timezone
+
+from apps.branch.models import Sucursal
+from apps.client.models import Client
+from apps.inventory.models import Inventario
+from apps.payment.models import Pago
+from apps.payment.services import registrar_pago, registrar_pagos_mixtos
+from apps.product.models import Product
+from apps.purchase.models import Compra, CompraDetalle
+from apps.sale.models import Venta
+from apps.supplier.models import Proveedor
+
+
+class PagosTests(TestCase):
+    def setUp(self):
+        self.sucursal = Sucursal.objects.create(nombre="Sur")
+        self.cliente = Client.objects.create(tipo_documento="CC", numero_documento="9100", nombre="Marta")
+        self.producto = Product.objects.create(sku="PAN-9", nombre="Pan", precio=Decimal("10.00"))
+        Inventario.objects.create(sucursal=self.sucursal, producto=self.producto, cantidad=10)
+        self.venta = Venta.objects.register(
+            cliente=self.cliente,
+            sucursal=self.sucursal,
+            fecha=timezone.now(),
+            items=[{"producto_id": self.producto.id, "cantidad": 2}],
+        )
+
+    def test_mixed_payment_covers_total(self):
+        pagos = registrar_pagos_mixtos(
+            venta=self.venta,
+            pagos=[
+                {"metodo": Pago.Metodo.EFECTIVO, "monto": "12.00"},
+                {"metodo": Pago.Metodo.TARJETA, "monto": "8.00"},
+            ],
+            fecha=timezone.now(),
+        )
+        self.assertEqual(len(pagos), 2)
+        self.assertEqual(Pago.objects.filter(referencia_id=self.venta.pk).count(), 2)
+
+    def test_mixed_payment_must_equal_total(self):
+        with self.assertRaises(ValidationError):
+            registrar_pagos_mixtos(
+                venta=self.venta,
+                pagos=[{"metodo": Pago.Metodo.EFECTIVO, "monto": "15.00"}],
+                fecha=timezone.now(),
+            )
+        self.assertEqual(Pago.objects.count(), 0)
+
+    def test_payment_above_balance_is_rejected(self):
+        registrar_pago(
+            referencia_tipo=Pago.ReferenciaTipo.VENTA,
+            referencia_id=self.venta.pk,
+            metodo=Pago.Metodo.EFECTIVO,
+            monto="15.00",
+            fecha=timezone.now(),
+        )
+        with self.assertRaises(ValidationError):
+            registrar_pago(
+                referencia_tipo=Pago.ReferenciaTipo.VENTA,
+                referencia_id=self.venta.pk,
+                metodo=Pago.Metodo.TARJETA,
+                monto="10.00",
+                fecha=timezone.now(),
+            )
+
+    def test_cannot_pay_voided_sale(self):
+        self.venta.void()
+        with self.assertRaises(ValidationError):
+            registrar_pago(
+                referencia_tipo=Pago.ReferenciaTipo.VENTA,
+                referencia_id=self.venta.pk,
+                metodo=Pago.Metodo.EFECTIVO,
+                monto="5.00",
+                fecha=timezone.now(),
+            )
+
+    def test_payment_on_purchase_uses_same_rules(self):
+        proveedor = Proveedor.objects.create(nit="900300", razon_social="Granos Andinos")
+        compra = Compra.objects.create(proveedor=proveedor, sucursal=self.sucursal, fecha=timezone.now())
+        CompraDetalle.objects.create(
+            compra=compra, producto=self.producto, cantidad=3, valor_unitario=Decimal("1000.00")
+        )
+        compra.recalcular_totales()
+        pago = registrar_pago(
+            referencia_tipo=Pago.ReferenciaTipo.COMPRA,
+            referencia_id=compra.pk,
+            metodo=Pago.Metodo.TRANSFERENCIA,
+            monto="1000.00",
+            fecha=timezone.now(),
+        )
+        self.assertEqual(pago.referencia_tipo, Pago.ReferenciaTipo.COMPRA)
+EOF
+python manage.py test apps.payment -v 2
+```
+
+![EVI-A-09 - Pruebas de pagos en PASS](./trazabilidad/EVI-A-09.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `PagosTests` listadas como `ok`].
+
+**Conclusión y aprendizaje:** Aprendí que la misma regla de saldo sirve para ventas y compras. La prueba de venta anulada demuestra que el estado de la referencia también bloquea los pagos, no solo los montos.
+
+### Criterios de aceptación de A-05 a A-09
+
+| AC | Criterio | Verificación | Evidencia | Resultado |
+|:---|:---|:---|:---|:---|
+| AC-A-07 | Una recepción parcial suma al inventario y deja la compra en `PARCIAL` | Test `test_partial_reception_adds_inventory_and_sets_parcial` | EVI-A-06 | [PASS] |
+| AC-A-08 | Recibir todo deja la compra en `RECIBIDA` | Test `test_full_reception_sets_recibida` | EVI-A-06 | [PASS] |
+| AC-A-09 | No se puede recibir más de lo pendiente | Test `test_over_reception_is_rejected` | EVI-A-06 | [PASS] |
+| AC-A-10 | Un fallo en la recepción revierte inventario y líneas | Test `test_failure_during_inventory_update_rolls_back` | EVI-A-06 | [PASS] |
+| AC-A-11 | La tabla `pagos` existe y `payment` está migrada | Paso A-07 | EVI-A-07 | [PASS] |
+| AC-A-12 | Un pago mixto solo se acepta si su suma es igual al total de la venta | Test `test_mixed_payment_must_equal_total` | EVI-A-09 | [PASS] |
+| AC-A-13 | Un pago no supera el saldo pendiente ni se aplica a una referencia anulada | Tests `test_payment_above_balance_is_rejected` y `test_cannot_pay_voided_sale` | EVI-A-09 | [PASS] |
+| AC-A-14 | El mismo servicio de pagos funciona para ventas y compras | Test `test_payment_on_purchase_uses_same_rules` | EVI-A-09 | [PASS] |
+
+### Paso A-10 - Aplicación `returns` y modelos
+
+Creé la aplicación `returns` con `Devolucion` y `DevolucionDetalle`. Cada devolución pertenece a una venta, y cada línea apunta a una línea concreta de esa venta (`VentaDetalle`). El total de cada línea se calcula con el valor unitario congelado en la venta, no con el precio actual del producto.
+
+```bash
+mkdir -p apps/returns
+python manage.py startapp returns apps/returns
+cat > apps/returns/apps.py <<'EOF'
+from django.apps import AppConfig
+
+
+class ReturnsConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.returns"
+    label = "returns"
+EOF
+sed -i '/"apps.payment.apps.PaymentConfig",/a\    "apps.returns.apps.ReturnsConfig",' config/settings/__init__.py
+grep -n "apps\." config/settings/__init__.py
+```
+
+```bash
+cat > apps/returns/models.py <<'EOF'
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
+from django.db import models
+
+from apps.common.models import TimeStampedModel
+from apps.sale.models import Venta, VentaDetalle
+
+
+class Devolucion(TimeStampedModel):
+    class Estado(models.TextChoices):
+        REGISTRADA = "REGISTRADA", "Registrada"
+        ANULADA = "ANULADA", "Anulada"
+
+    venta = models.ForeignKey(
+        Venta, on_delete=models.RESTRICT, related_name="devoluciones", db_column="venta_id"
+    )
+    fecha = models.DateTimeField()
+    motivo = models.CharField(max_length=255)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.REGISTRADA)
+
+    class Meta:
+        db_table = "devoluciones"
+        verbose_name = "devolución"
+        verbose_name_plural = "devoluciones"
+        ordering = ["-fecha", "-id"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(total__gte=0), name="devolucion_total_no_negativo"),
+        ]
+
+    def __str__(self):
+        return f"Devolución {self.pk} de venta {self.venta_id}"
+
+
+class DevolucionDetalle(TimeStampedModel):
+    devolucion = models.ForeignKey(
+        Devolucion, on_delete=models.RESTRICT, related_name="detalles", db_column="devolucion_id"
+    )
+    venta_detalle = models.ForeignKey(
+        VentaDetalle, on_delete=models.RESTRICT, related_name="devoluciones", db_column="venta_detalle_id"
+    )
+    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    valor_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+    total = models.DecimalField(max_digits=12, decimal_places=2)
+
+    class Meta:
+        db_table = "devolucion_detalles"
+        verbose_name = "detalle de devolución"
+        verbose_name_plural = "detalles de devolución"
+        ordering = ["id"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(cantidad__gte=1), name="devolucion_detalle_cantidad_positiva"),
+        ]
+
+    def __str__(self):
+        return f"{self.venta_detalle.producto} x {self.cantidad}"
+
+    def save(self, *args, **kwargs):
+        self.total = (self.valor_unitario * self.cantidad).quantize(Decimal("0.01"))
+        super().save(*args, **kwargs)
+EOF
+python manage.py check
+```
+
+![EVI-A-10 - Modelos de devolución y registro de la aplicación](./trazabilidad/EVI-A-10.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Devolucion` con `venta` como clave foránea y `DevolucionDetalle` con `venta_detalle`; la línea `apps.returns.apps.ReturnsConfig` en `INSTALLED_APPS`; y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que `related_name="devoluciones"` aparece en dos modelos distintos (`Venta` y `VentaDetalle`), y que cada uno lo usa para una relación diferente. Por eso es importante que el nombre describa la relación y no solo el modelo.
+
+### Paso A-11 - Migraciones
+
+```bash
+python manage.py makemigrations returns
+python manage.py migrate returns
+python manage.py showmigrations returns
+```
+
+![EVI-A-11 - Migración de returns](./trazabilidad/EVI-A-11.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Create model Devolucion`, `Create model DevolucionDetalle` y `[X] 0001_initial` bajo `returns`].
+
+**Conclusión y aprendizaje:** Aprendí que `returns` depende de `sale`, así que Django la migra después de `sale` aunque el comando sea `migrate returns`.
+
+### Paso A-12 - Servicio de devolución
+
+Creé `apps/returns/services.py` con `registrar_devolucion`. La función bloquea la venta y sus líneas, verifica que la venta esté activa y que ninguna línea supere lo vendido menos lo ya devuelto, crea la devolución y devuelve la cantidad al inventario de la sucursal de la venta. Todo ocurre en una transacción.
+
+```bash
+cat > apps/returns/services.py <<'EOF'
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Sum
+from django.utils import timezone
+
+from apps.inventory.models import Inventario
+from apps.returns.models import Devolucion, DevolucionDetalle
+from apps.sale.models import Venta, VentaDetalle
+
+
+def registrar_devolucion(*, venta, lineas, motivo, fecha=None):
+    if not lineas:
+        raise ValidationError({"lineas": ["La devolución requiere al menos una línea."]})
+
+    cantidades = {}
+    for item in lineas:
+        cantidad = int(item["cantidad"])
+        if cantidad < 1:
+            raise ValidationError({"lineas": ["La cantidad devuelta debe ser al menos 1."]})
+        detalle_id = int(item["venta_detalle_id"])
+        cantidades[detalle_id] = cantidades.get(detalle_id, 0) + cantidad
+
+    with transaction.atomic():
+        venta = Venta.objects.select_for_update().get(pk=venta.pk)
+        if venta.estado != Venta.Estado.ACTIVA:
+            raise ValidationError({"venta": ["Solo se puede devolver una venta activa."]})
+
+        detalles = {
+            d.pk: d
+            for d in VentaDetalle.objects.select_for_update().filter(venta=venta, pk__in=cantidades)
+        }
+        if len(detalles) != len(cantidades):
+            raise ValidationError({"lineas": ["Hay líneas que no pertenecen a esta venta."]})
+
+        for detalle_id, cantidad in cantidades.items():
+            detalle = detalles[detalle_id]
+            ya_devuelto = (
+                DevolucionDetalle.objects.filter(
+                    venta_detalle=detalle,
+                    devolucion__estado=Devolucion.Estado.REGISTRADA,
+                ).aggregate(total=Sum("cantidad"))["total"]
+                or 0
+            )
+            disponible = detalle.cantidad - ya_devuelto
+            if cantidad > disponible:
+                raise ValidationError(
+                    {"lineas": [f"Solo quedan {disponible} unidades de {detalle.producto} por devolver."]}
+                )
+
+        devolucion = Devolucion.objects.create(
+            venta=venta,
+            fecha=fecha or timezone.now(),
+            motivo=motivo,
+        )
+
+        total = Decimal("0.00")
+        for detalle_id, cantidad in cantidades.items():
+            detalle = detalles[detalle_id]
+            linea = DevolucionDetalle.objects.create(
+                devolucion=devolucion,
+                venta_detalle=detalle,
+                cantidad=cantidad,
+                valor_unitario=detalle.valor_unitario,
+            )
+            total += linea.total
+
+            inventario, _ = Inventario.objects.get_or_create(
+                sucursal=venta.sucursal,
+                producto=detalle.producto,
+                defaults={"cantidad": 0},
+            )
+            inventario = Inventario.objects.select_for_update().get(pk=inventario.pk)
+            inventario.cantidad += cantidad
+            inventario.save(update_fields=["cantidad", "updated_at"])
+
+        devolucion.total = total.quantize(Decimal("0.01"))
+        devolucion.save(update_fields=["total", "updated_at"])
+        return devolucion
+EOF
+python manage.py check
+```
+
+![EVI-A-12 - Servicio registrar_devolucion](./trazabilidad/EVI-A-12.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [la verificación de que la venta esté activa, el cálculo de lo ya devuelto con `Sum`, la creación de la devolución dentro de la transacción y la suma al inventario de la sucursal de la venta; y `System check identified no issues (0 silenced).`].
+
+**Conclusión y aprendizaje:** Aprendí que la validación de "no devolver más de lo vendido" suma las devoluciones registradas de cada línea, no solo la cantidad de la línea. Así dos devoluciones parciales no pueden superar la cantidad original.
+
+### Paso A-13 - Pruebas de devolución
+
+Escribí las pruebas en `apps/returns/test_services.py`. Cubren la devolución parcial, el rechazo de exceso, el acumulado entre devoluciones, la venta anulada y la reversión completa ante un fallo.
+
+```bash
+cat > apps/returns/test_services.py <<'EOF'
+from decimal import Decimal
+from unittest.mock import patch
+
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+from django.utils import timezone
+
+from apps.branch.models import Sucursal
+from apps.client.models import Client
+from apps.inventory.models import Inventario
+from apps.product.models import Product
+from apps.returns.models import Devolucion, DevolucionDetalle
+from apps.returns.services import registrar_devolucion
+from apps.sale.models import Venta
+
+
+class DevolucionTests(TestCase):
+    def setUp(self):
+        self.sucursal = Sucursal.objects.create(nombre="Oeste")
+        self.cliente = Client.objects.create(tipo_documento="CC", numero_documento="7300", nombre="Pilar")
+        self.producto = Product.objects.create(sku="CAFE-13", nombre="Café", precio=Decimal("10.00"))
+        self.inventario = Inventario.objects.create(sucursal=self.sucursal, producto=self.producto, cantidad=10)
+        self.venta = Venta.objects.register(
+            cliente=self.cliente,
+            sucursal=self.sucursal,
+            fecha=timezone.now(),
+            items=[{"producto_id": self.producto.id, "cantidad": 4}],
+        )
+        self.linea = self.venta.detalles.get()
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.cantidad, 6)
+
+    def _devolver(self, cantidad):
+        return registrar_devolucion(
+            venta=self.venta,
+            lineas=[{"venta_detalle_id": self.linea.pk, "cantidad": cantidad}],
+            motivo="Producto dañado",
+        )
+
+    def test_partial_return_restores_inventory_and_total(self):
+        devolucion = self._devolver(1)
+        self.assertEqual(devolucion.total, Decimal("10.00"))
+        self.assertEqual(devolucion.estado, Devolucion.Estado.REGISTRADA)
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.cantidad, 7)
+
+    def test_cannot_return_more_than_sold(self):
+        with self.assertRaises(ValidationError):
+            self._devolver(5)
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.cantidad, 6)
+        self.assertEqual(Devolucion.objects.count(), 0)
+
+    def test_returns_accumulate_across_devoluciones(self):
+        self._devolver(3)
+        with self.assertRaises(ValidationError):
+            self._devolver(2)
+        self._devolver(1)
+        with self.assertRaises(ValidationError):
+            self._devolver(1)
+        self.assertEqual(DevolucionDetalle.objects.count(), 2)
+
+    def test_voided_sale_cannot_be_returned(self):
+        self.venta.void()
+        with self.assertRaises(ValidationError):
+            self._devolver(1)
+
+    def test_failure_during_inventory_update_rolls_back(self):
+        original = Inventario.save
+
+        def fail_on_stock(inventario, *args, **kwargs):
+            if "cantidad" in (kwargs.get("update_fields") or []):
+                raise RuntimeError("fallo al devolver inventario")
+            return original(inventario, *args, **kwargs)
+
+        with patch.object(Inventario, "save", fail_on_stock):
+            with self.assertRaises(RuntimeError):
+                self._devolver(2)
+        self.assertEqual(Devolucion.objects.count(), 0)
+        self.assertEqual(DevolucionDetalle.objects.count(), 0)
+        self.inventario.refresh_from_db()
+        self.assertEqual(self.inventario.cantidad, 6)
+EOF
+python manage.py test apps.returns -v 2
+```
+
+![EVI-A-13 - Pruebas de devolución en PASS](./trazabilidad/EVI-A-13.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`Ran 5 tests` y `OK`, con las cinco pruebas de `DevolucionTests` listadas como `ok`].
+
+**Conclusión y aprendizaje:** Aprendí que la prueba de acumulado es la que detecta el error más común: validar cada devolución contra la venta original, sin descontar las devoluciones anteriores.
+
+### Paso A-14 - Registro en el admin
+
+Registré `Devolucion` en el admin como solo lectura, igual que Venta: las devoluciones se crean solo por el servicio.
+
+```bash
+cat > apps/returns/admin.py <<'EOF'
+from django.contrib import admin
+
+from apps.returns.models import Devolucion, DevolucionDetalle
+
+
+class DevolucionDetalleInline(admin.TabularInline):
+    model = DevolucionDetalle
+    extra = 0
+    can_delete = False
+    fields = ("venta_detalle", "cantidad", "valor_unitario", "total")
+    readonly_fields = ("venta_detalle", "cantidad", "valor_unitario", "total")
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Devolucion)
+class DevolucionAdmin(admin.ModelAdmin):
+    list_display = ("id", "venta", "fecha", "motivo", "total", "estado")
+    list_filter = ("estado",)
+    search_fields = ("venta__cliente__nombre", "motivo")
+    ordering = ("-fecha", "-id")
+    readonly_fields = ("venta", "fecha", "motivo", "total", "estado", "created_at", "updated_at")
+    inlines = (DevolucionDetalleInline,)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+EOF
+wc -l apps/returns/admin.py
+python manage.py check
+```
+
+![EVI-A-14 - Admin de devoluciones en solo lectura](./trazabilidad/EVI-A-14.png)
+
+**Retroalimentación de la evidencia:** En la captura observé [`DevolucionAdmin` con `has_add_permission` y `has_delete_permission` en `False`, y el inline de detalles en solo lectura; y `wc -l` con más de 20 líneas].
+
+**Conclusión y aprendizaje:** Aprendí que el admin de un modelo con reglas de negocio debe ser de solo lectura, porque cualquier cambio manual saltaría la validación de cantidades y el ajuste del inventario.
+
+### Criterios de aceptación de A-10 a A-14
+
+Los criterios A-15 a A-19 quedan pendientes de verificación documental: en `trazabilidad/` todavía no están las capturas EVI-A-11 ni EVI-A-13. No se marcan PASS hasta incorporar esas evidencias.
+
+| AC | Criterio | Verificación | Evidencia | Resultado |
+|:---|:---|:---|:---|:---|
+| AC-A-15 | La tabla `devoluciones` y `devolucion_detalles` existen | Paso A-11 | Pendiente: EVI-A-11 | [PENDIENTE] |
+| AC-A-16 | Una devolución parcial suma al inventario y calcula el total con el precio de la venta | Test `test_partial_return_restores_inventory_and_total` | Pendiente: EVI-A-13 | [PENDIENTE] |
+| AC-A-17 | No se devuelve más de lo vendido, contando las devoluciones previas | Tests `test_cannot_return_more_than_sold` y `test_returns_accumulate_across_devoluciones` | Pendiente: EVI-A-13 | [PENDIENTE] |
+| AC-A-18 | Una venta anulada no admite devoluciones | Test `test_voided_sale_cannot_be_returned` | Pendiente: EVI-A-13 | [PENDIENTE] |
+| AC-A-19 | Un fallo al devolver inventario revierte la devolución completa | Test `test_failure_during_inventory_update_rolls_back` | Pendiente: EVI-A-13 | [PENDIENTE] |
